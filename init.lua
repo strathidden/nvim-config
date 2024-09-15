@@ -56,9 +56,11 @@ vim.opt.rtp:prepend(lazypath)
 -- Setup lazy.nvim
 require("lazy").setup({
     {
-        "rebelot/kanagawa.nvim",
+        "sainnhe/everforest",
         config = function()
-            vim.cmd.colorscheme("kanagawa-wave")
+            vim.cmd.colorscheme("everforest")
+            --vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+            --vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
         end,
     },
     {
@@ -406,5 +408,148 @@ require("lazy").setup({
                 }
             })
         end,
+    },
+    {
+        "stevearc/oil.nvim",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        config = function()
+            require("oil").setup({
+                columns = { "icon" },
+                view_options = {
+                    show_hidden = true,
+                },
+            })
+            vim.keymap.set("n", "-", "<CMD>Oil<CR>", { desc = "Open parent directory" })
+        end,
+    },
+    {
+        "nvim-lualine/lualine.nvim",
+        dependencies = { "nvim-tree/nvim-web-devicons" },
+        event = { "VimEnter", "InsertEnter", "BufReadPre", "BufAdd", "BufNew", "BufReadPost" },
+        config = function()
+            local lualine = require("lualine")
+
+            local diagnostics = {
+                "diagnostics",
+                sources = { "nvim_diagnostic" },
+                sections = { "error", "warn" },
+                symbols = { error = " ", warn = " " },
+                colored = false,
+                always_visible = true,
+            }
+
+            local diff = {
+                "diff",
+                colored = false,
+                symbols = { added = " ", modified = " ", removed = " " },
+            }
+
+            lualine.setup {
+                options = {
+                    globalstatus = true,
+                    icons_enabled = true,
+                    theme = "auto",
+                    component_separators = { left = "", right = "" },
+                    section_separators = { left = "", right = "" },
+                    disabled_filetypes = { "alpha","NVimTree" },
+                    always_divide_middle = true,
+                    ignore_focus = {
+                        "dapui_watches", "dapui_breakpoints",
+                        "dapui_scopes", "dapui_console",
+                        "dapui_stacks", "dap-repl"
+                    }
+                },
+                sections = {
+                    lualine_a = { "mode" },
+                    lualine_b = { "branch" },
+                    lualine_c = { diagnostics },
+                    lualine_x = { diff },
+                    lualine_y = { "location" },
+                    lualine_z = { "progress" },
+                },
+            }
+        end,
+    },
+    {
+        "ThePrimeagen/harpoon",
+        branch = "harpoon2",
+        dependencies = { "nvim-lua/plenary.nvim" },
+        config = function ()
+            local harpoon = require("harpoon")
+
+            harpoon:setup()
+
+            vim.keymap.set("n", "<leader>m", function() harpoon:list():add() end)
+            vim.keymap.set("n", "<leader>e", function() harpoon.ui:toggle_quick_menu(harpoon:list()) end)
+
+            vim.keymap.set("n", "<leader>h", function() harpoon:list():select(1) end)
+            vim.keymap.set("n", "<leader>j", function() harpoon:list():select(2) end)
+            vim.keymap.set("n", "<leader>k", function() harpoon:list():select(3) end)
+            vim.keymap.set("n", "<leader>l", function() harpoon:list():select(4) end)
+        end
+    },
+    {
+        "numToStr/Comment.nvim",
+        config = function ()
+            require("Comment").setup()
+        end
+    },
+    {
+        "zbirenbaum/copilot.lua",
+        cmd = "Copilot",
+        event = "InsertEnter",
+        config = function()
+            require('copilot').setup({
+                panel = {
+                    enabled = true,
+                    auto_refresh = false,
+                    keymap = {
+                        jump_prev = "[[",
+                        jump_next = "]]",
+                        accept = "<CR>",
+                        refresh = "gr",
+                        open = "<M-CR>"
+                    },
+                    layout = {
+                        position = "bottom", -- | top | left | right
+                        ratio = 0.4
+                    },
+                },
+                suggestion = {
+                    enabled = true,
+                    auto_trigger = true,
+                    debounce = 75,
+                    keymap = {
+                        accept = "<C-d>",
+                        accept_word = false,
+                        accept_line = false,
+                        next = "<M-]>",
+                        prev = "<M-[>",
+                        dismiss = "<C-]>",
+                    },
+                },
+                filetypes = {
+                    yaml = false,
+                    markdown = false,
+                    help = false,
+                    gitcommit = false,
+                    gitrebase = false,
+                    hgcommit = false,
+                    svn = false,
+                    cvs = false,
+                    ["."] = false,
+                },
+                copilot_node_command = 'node', -- Node.js version must be > 16.x
+                server_opts_overrides = {},
+            })
+        end,
+    },
+    {
+        "kylechui/nvim-surround",
+        version = "*", -- Use for stability; omit to use `main` branch for the latest features
+        event = "VeryLazy",
+        config = function()
+            require("nvim-surround").setup()
+        end
     },
 })
