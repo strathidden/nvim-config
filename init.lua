@@ -39,17 +39,17 @@ vim.g.mapleader = " "
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
-  local lazyrepo = "https://github.com/folke/lazy.nvim.git"
-  local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
-  if vim.v.shell_error ~= 0 then
-    vim.api.nvim_echo({
-      { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
-      { out, "WarningMsg" },
-      { "\nPress any key to exit..." },
-    }, true, {})
-    vim.fn.getchar()
-    os.exit(1)
-  end
+    local lazyrepo = "https://github.com/folke/lazy.nvim.git"
+    local out = vim.fn.system({ "git", "clone", "--filter=blob:none", "--branch=stable", lazyrepo, lazypath })
+    if vim.v.shell_error ~= 0 then
+        vim.api.nvim_echo({
+            { "Failed to clone lazy.nvim:\n", "ErrorMsg" },
+            { out,                            "WarningMsg" },
+            { "\nPress any key to exit..." },
+        }, true, {})
+        vim.fn.getchar()
+        os.exit(1)
+    end
 end
 vim.opt.rtp:prepend(lazypath)
 
@@ -102,7 +102,7 @@ require("lazy").setup({
                         },
                         selection_modes = {
                             ['@parameter.outer'] = 'v', -- charwise
-                            ['@function.outer'] = 'V', -- linewise
+                            ['@function.outer'] = 'V',  -- linewise
                             ['@class.outer'] = '<c-v>', -- blockwise
                         },
                         include_surrounding_whitespace = true,
@@ -207,52 +207,52 @@ require("lazy").setup({
         "hrsh7th/nvim-cmp",
         event = "InsertEnter",
         dependencies = {
-           "hrsh7th/cmp-buffer",
-           "hrsh7th/cmp-path",
-           "L3MON4D3/LuaSnip",
-           "saadparwaiz1/cmp_luasnip",
-           "rafamadriz/friendly-snippets",
-           "onsails/lspkind.nvim",
+            "hrsh7th/cmp-buffer",
+            "hrsh7th/cmp-path",
+            "L3MON4D3/LuaSnip",
+            "saadparwaiz1/cmp_luasnip",
+            "rafamadriz/friendly-snippets",
+            "onsails/lspkind.nvim",
         },
         config = function()
-           local cmp = require("cmp")
+            local cmp = require("cmp")
 
-           local luasnip = require("luasnip")
+            local luasnip = require("luasnip")
 
-           local lspkind = require("lspkind")
+            local lspkind = require("lspkind")
 
-           require("luasnip.loaders.from_vscode").lazy_load()
+            require("luasnip.loaders.from_vscode").lazy_load()
 
-           cmp.setup({
-               completion = {
-                   completeopt = "menu,menuone,preview,noselect",
-               },
-               snippet = {
-                   expand = function(args)
-                       luasnip.lsp_expand(args.body)
-                   end,
-               },
-               mapping = cmp.mapping.preset.insert({
-                   ["<S-Tab>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-                   ["<Tab>"] = cmp.mapping.select_next_item(), -- next suggestion
-                   ["<C-d>"] = cmp.mapping.scroll_docs(-4),
-                   ["<C-f>"] = cmp.mapping.scroll_docs(4),
-                   ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
-                   ["<CR>"] = cmp.mapping.confirm({ select = true }),
-               }),
-               sources = cmp.config.sources({
-                   { name = "nvim_lsp" },
-                   { name = "luasnip" }, -- snippets
-                   { name = "buffer" }, -- text within current buffer
-                   { name = "path" }, -- file system paths
-               }),
-               formatting = {
-                   format = lspkind.cmp_format({
-                       maxwidth = 50,
-                       ellipsis_char = "...",
-                   }),
-               },
-           })
+            cmp.setup({
+                completion = {
+                    completeopt = "menu,menuone,preview,noselect",
+                },
+                snippet = {
+                    expand = function(args)
+                        luasnip.lsp_expand(args.body)
+                    end,
+                },
+                mapping = cmp.mapping.preset.insert({
+                    ["<S-Tab>"] = cmp.mapping.select_prev_item(), -- previous suggestion
+                    ["<Tab>"] = cmp.mapping.select_next_item(),   -- next suggestion
+                    ["<C-d>"] = cmp.mapping.scroll_docs(-4),
+                    ["<C-f>"] = cmp.mapping.scroll_docs(4),
+                    ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
+                    ["<CR>"] = cmp.mapping.confirm({ select = true }),
+                }),
+                sources = cmp.config.sources({
+                    { name = "nvim_lsp" },
+                    { name = "luasnip" }, -- snippets
+                    { name = "buffer" },  -- text within current buffer
+                    { name = "path" },    -- file system paths
+                }),
+                formatting = {
+                    format = lspkind.cmp_format({
+                        maxwidth = 50,
+                        ellipsis_char = "...",
+                    }),
+                },
+            })
         end,
     },
     {
@@ -267,11 +267,11 @@ require("lazy").setup({
 
             -- configure autopairs
             autopairs.setup({
-                check_ts = true, -- enable treesitter
+                check_ts = true,                        -- enable treesitter
                 ts_config = {
-                    lua = { "string" }, -- don't add pairs in lua string treesitter nodes
+                    lua = { "string" },                 -- don't add pairs in lua string treesitter nodes
                     javascript = { "template_string" }, -- don't add pairs in javscript template_string treesitter nodes
-                    java = false, -- don't check treesitter on java
+                    java = false,                       -- don't check treesitter on java
                 },
             })
 
@@ -315,7 +315,7 @@ require("lazy").setup({
                     mappings = {
                         i = {
                             ["<C-k>"] = actions.move_selection_previous, -- move to prev result
-                            ["<C-j>"] = actions.move_selection_next, -- move to next result
+                            ["<C-j>"] = actions.move_selection_next,     -- move to next result
                         },
                     },
                 },
@@ -451,7 +451,7 @@ require("lazy").setup({
                     theme = "auto",
                     component_separators = { left = "", right = "" },
                     section_separators = { left = "", right = "" },
-                    disabled_filetypes = { "alpha","NVimTree" },
+                    disabled_filetypes = { "alpha", "NVimTree" },
                     always_divide_middle = true,
                     ignore_focus = {
                         "dapui_watches", "dapui_breakpoints",
@@ -474,7 +474,7 @@ require("lazy").setup({
         "ThePrimeagen/harpoon",
         branch = "harpoon2",
         dependencies = { "nvim-lua/plenary.nvim" },
-        config = function ()
+        config = function()
             local harpoon = require("harpoon")
 
             harpoon:setup()
@@ -490,7 +490,7 @@ require("lazy").setup({
     },
     {
         "numToStr/Comment.nvim",
-        config = function ()
+        config = function()
             require("Comment").setup()
         end
     },
@@ -551,5 +551,41 @@ require("lazy").setup({
         config = function()
             require("nvim-surround").setup()
         end
+    },
+    {
+        "stevearc/conform.nvim",
+        event = { "BufWritePre" },
+        cmd = { "ConformInfo" },
+        keys = {
+            {
+                "<leader>x",
+                function()
+                    require('conform').format { async = true, lsp_format = 'fallback' }
+                end,
+                mode = '',
+                desc = '[F]ormat buffer',
+            },
+        },
+        opts = {
+            notify_on_error = false,
+            format_on_save = function(bufnr)
+                local disable_filetypes = { c = true, cpp = true }
+                local lsp_format_opt
+                if disable_filetypes[vim.bo[bufnr].filetype] then
+                    lsp_format_opt = 'never'
+                else
+                    lsp_format_opt = 'fallback'
+                end
+                return {
+                    timeout_ms = 500,
+                    lsp_format = lsp_format_opt,
+                }
+            end,
+            formatters_by_ft = {
+                lua = { 'stylua' },
+                tsx = { 'prettier' },
+                ts = { 'prettier' },
+            },
+        },
     },
 })
