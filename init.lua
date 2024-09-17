@@ -19,7 +19,7 @@ vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undofile = true
 
-vim.opt.signcolumn = "no"
+--vim.opt.signcolumn = "no"
 
 vim.opt.clipboard = "unnamedplus"
 
@@ -563,7 +563,6 @@ require("lazy").setup({
                     require('conform').format { async = true, lsp_format = 'fallback' }
                 end,
                 mode = '',
-                desc = '[F]ormat buffer',
             },
         },
         opts = {
@@ -583,9 +582,76 @@ require("lazy").setup({
             end,
             formatters_by_ft = {
                 lua = { 'stylua' },
-                tsx = { 'prettier' },
-                ts = { 'prettier' },
+                tsx = { 'prettierd', 'prettier' },
+                ts = { 'prettierd', 'prettier' },
             },
         },
+    },
+    {
+        "mfussenegger/nvim-dap",
+        event = "VeryLazy",
+        config = function()
+            local dap = require("dap")
+            vim.keymap.set("n", "<leader>dd", function() dap.toggle_breakpoint() end)
+            vim.keymap.set("n", "<leader>dc", function() dap.continue() end)
+            vim.keymap.set("n", "<leader>dn", function() dap.step_over() end)
+            vim.keymap.set("n", "<leader>di", function() dap.step_into() end)
+            vim.keymap.set("n", "<leader>do", function() dap.step_out() end)
+            vim.keymap.set("n", "<leader>dx", function() dap.terminate() end)
+        end
+    },
+    {
+        "jay-babu/mason-nvim-dap.nvim",
+        event = "VeryLazy",
+        dependencies = {
+            "williamboman/mason.nvim",
+            "mfussenegger/nvim-dap",
+        },
+        config = function()
+            require("mason-nvim-dap").setup({
+                handlers = {},
+            })
+        end
+    },
+    {
+        "rcarriga/nvim-dap-ui",
+        event = "VeryLazy",
+        dependencies = {
+            "mfussenegger/nvim-dap",
+            "nvim-neotest/nvim-nio",
+        },
+        config = function()
+            local dap = require("dap")
+            local dapui = require("dapui")
+            dapui.setup({})
+            dap.listeners.before.attach.dapui_config = function()
+                dapui.open()
+            end
+            dap.listeners.before.launch.dapui_config = function()
+                dapui.open()
+            end
+            dap.listeners.before.event_terminated.dapui_config = function()
+                dapui.close()
+            end
+            dap.listeners.before.event_exited.dapui_config = function()
+                dapui.close()
+            end
+        end
+    },
+    {
+        'kristijanhusak/vim-dadbod-ui',
+        dependencies = {
+            { 'tpope/vim-dadbod',                     lazy = true },
+            { 'kristijanhusak/vim-dadbod-completion', ft = { 'sql', 'mysql', 'plsql' }, lazy = true },
+        },
+        cmd = {
+            'DBUI',
+            'DBUIToggle',
+            'DBUIAddConnection',
+            'DBUIFindBuffer',
+        },
+        config = function()
+            vim.g.db_ui_use_nerd_fonts = 1
+        end
     },
 })
