@@ -19,7 +19,7 @@ vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undofile = true
 
---vim.opt.signcolumn = "no"
+vim.opt.signcolumn = "no"
 
 vim.opt.clipboard = "unnamedplus"
 
@@ -59,8 +59,10 @@ require("lazy").setup({
 		"sainnhe/everforest",
 		config = function()
 			vim.cmd.colorscheme("everforest")
-			--vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-			--vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+			-- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+			-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+			-- vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
+            -- vim.api.nvim_set_hl(0, "FloatBorder", { bg = "none" })
 		end,
 	},
 	{
@@ -335,19 +337,6 @@ require("lazy").setup({
 		end,
 	},
 	{
-		"kdheepak/lazygit.nvim",
-		cmd = {
-			"LazyGit",
-			"LazyGitConfig",
-			"LazyGitCurrentFile",
-			"LazyGitFilter",
-			"LazyGitFilterCurrentFile",
-		},
-		keys = {
-			{ "<leader>lg", "<cmd>LazyGit<cr>", desc = "Open lazy git" },
-		},
-	},
-	{
 		"nvim-telescope/telescope.nvim",
 		dependencies = {
 			"nvim-lua/plenary.nvim",
@@ -559,70 +548,12 @@ require("lazy").setup({
 		end,
 	},
 	{
-		"zbirenbaum/copilot.lua",
-		cmd = "Copilot",
-		event = "InsertEnter",
-		config = function()
-			require("copilot").setup({
-				panel = {
-					enabled = true,
-					auto_refresh = false,
-					keymap = {
-						jump_prev = "[[",
-						jump_next = "]]",
-						accept = "<CR>",
-						refresh = "gr",
-						open = "<M-CR>",
-					},
-					layout = {
-						position = "bottom", -- | top | left | right
-						ratio = 0.4,
-					},
-				},
-				suggestion = {
-					enabled = true,
-					auto_trigger = true,
-					debounce = 75,
-					keymap = {
-						accept = "<C-d>",
-						accept_word = false,
-						accept_line = false,
-						next = "<M-]>",
-						prev = "<M-[>",
-						dismiss = "<C-]>",
-					},
-				},
-				filetypes = {
-					yaml = false,
-					markdown = false,
-					help = false,
-					gitcommit = false,
-					gitrebase = false,
-					hgcommit = false,
-					svn = false,
-					cvs = false,
-					["."] = false,
-				},
-				copilot_node_command = "node", -- Node.js version must be > 16.x
-				server_opts_overrides = {},
-			})
-		end,
-	},
-	{
-		"kylechui/nvim-surround",
-		version = "*", -- Use for stability; omit to use `main` branch for the latest features
-		event = "VeryLazy",
-		config = function()
-			require("nvim-surround").setup()
-		end,
-	},
-	{
 		"stevearc/conform.nvim",
 		event = { "BufWritePre" },
 		cmd = { "ConformInfo" },
 		keys = {
 			{
-				"<leader>x",
+				"<leader>fm",
 				function()
 					require("conform").format({ async = true, lsp_format = "fallback" })
 				end,
@@ -643,69 +574,6 @@ require("lazy").setup({
 				},
 			},
 		},
-	},
-	{
-		"mfussenegger/nvim-dap",
-		event = "VeryLazy",
-		config = function()
-			local dap = require("dap")
-			vim.keymap.set("n", "<leader>dd", function()
-				dap.toggle_breakpoint()
-			end)
-			vim.keymap.set("n", "<leader>dc", function()
-				dap.continue()
-			end)
-			vim.keymap.set("n", "<leader>dn", function()
-				dap.step_over()
-			end)
-			vim.keymap.set("n", "<leader>di", function()
-				dap.step_into()
-			end)
-			vim.keymap.set("n", "<leader>do", function()
-				dap.step_out()
-			end)
-			vim.keymap.set("n", "<leader>dx", function()
-				dap.terminate()
-			end)
-		end,
-	},
-	{
-		"jay-babu/mason-nvim-dap.nvim",
-		event = "VeryLazy",
-		dependencies = {
-			"williamboman/mason.nvim",
-			"mfussenegger/nvim-dap",
-		},
-		config = function()
-			require("mason-nvim-dap").setup({
-				handlers = {},
-			})
-		end,
-	},
-	{
-		"rcarriga/nvim-dap-ui",
-		event = "VeryLazy",
-		dependencies = {
-			"mfussenegger/nvim-dap",
-			"nvim-neotest/nvim-nio",
-		},
-		config = function()
-			local dap = require("dap")
-			local dapui = require("dapui")
-			dapui.setup({})
-			dap.listeners.before.attach.dapui_config = function()
-				dapui.open()
-			end
-			dap.listeners.before.launch.dapui_config = function()
-				dapui.open()
-			end
-			dap.listeners.before.event_terminated.dapui_config = function()
-				dapui.close()
-			end
-			dap.listeners.before.event_exited.dapui_config = function()
-				dapui.close()
-			end
-		end,
 	},
 	{
 		"kristijanhusak/vim-dadbod-ui",
