@@ -36,6 +36,13 @@ vim.opt.termguicolors = true
 
 vim.g.mapleader = " "
 
+vim.filetype.add({
+    extension = {
+        vert = "glsl",
+        frag = "glsl",
+    },
+})
+
 -- Bootstrap lazy.nvim
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -59,10 +66,10 @@ require("lazy").setup({
 		"sainnhe/everforest",
 		config = function()
 			vim.cmd.colorscheme("everforest")
-			-- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-			-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-			-- vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
-            -- vim.api.nvim_set_hl(0, "FloatBorder", { bg = "none" })
+			vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+			vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+			vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
+            vim.api.nvim_set_hl(0, "FloatBorder", { bg = "none" })
 		end,
 	},
 	{
@@ -176,6 +183,13 @@ require("lazy").setup({
 						on_attach = on_attach,
 					})
 				end,
+                ["clangd"] = function ()
+                    lspconfig["clangd"].setup({
+                        cmd = { "clangd", "--header-insertion=never" },
+                        capabilities = capabilities,
+                        on_attach = on_attach,
+                    })
+                end
 			})
 		end,
 	},
@@ -567,6 +581,7 @@ require("lazy").setup({
 				tsx = { "prettierd", "prettier" },
 				ts = { "prettierd", "prettier" },
 				cpp = { "clang_format" },
+                h = { "clang_format" },
 			},
 			formatters = {
 				clang_format = {
@@ -591,4 +606,10 @@ require("lazy").setup({
 			vim.g.db_ui_use_nerd_fonts = 1
 		end,
 	},
+    {
+        "mbbill/undotree",
+        config = function ()
+            vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
+        end
+    },
 })
