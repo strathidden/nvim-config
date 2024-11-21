@@ -1,11 +1,8 @@
--- Options
 vim.opt.number = true
 vim.opt.relativenumber = true
 
 vim.opt.splitbelow = true
 vim.opt.splitright = true
-
-vim.opt.wrap = false
 
 vim.opt.expandtab = true
 vim.opt.autoindent = true
@@ -40,10 +37,26 @@ vim.filetype.add({
     extension = {
         vert = "glsl",
         frag = "glsl",
+        comp = "glsl"
     },
 })
 
--- Bootstrap lazy.nvim
+vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
+vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
+
+vim.keymap.set('n', '<leader>q', vim.diagnostic.setqflist)
+
+vim.api.nvim_create_autocmd('BufReadPost', {
+    group = vim.api.nvim_create_augroup('last_loc', { clear = true }),
+    callback = function()
+        local mark = vim.api.nvim_buf_get_mark(0, '"')
+        local lcount = vim.api.nvim_buf_line_count(0)
+        if mark[1] > 0 and mark[1] <= lcount then
+            pcall(vim.api.nvim_win_set_cursor, 0, mark)
+        end
+    end,
+})
+
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
 	local lazyrepo = "https://github.com/folke/lazy.nvim.git"
@@ -60,18 +73,13 @@ if not (vim.uv or vim.loop).fs_stat(lazypath) then
 end
 vim.opt.rtp:prepend(lazypath)
 
--- Setup lazy.nvim
 require("lazy").setup({
-	{
-		"sainnhe/everforest",
-		config = function()
-			vim.cmd.colorscheme("everforest")
-			vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-			vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-			vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
-            vim.api.nvim_set_hl(0, "FloatBorder", { bg = "none" })
-		end,
-	},
+    {
+        "EdenEast/nightfox.nvim",
+        config = function ()
+            vim.cmd.colorscheme("terafox")
+        end
+    },
 	{
 		"nvim-treesitter/nvim-treesitter",
 		dependencies = {
@@ -369,7 +377,16 @@ require("lazy").setup({
 							["<C-k>"] = actions.move_selection_previous, -- move to prev result
 							["<C-j>"] = actions.move_selection_next, -- move to next result
 						},
+                        n = { ['q'] = actions.close },
 					},
+                    extensions = {
+                        fzf = {
+                            fuzzy = true,
+                            override_generic_sorter = true,
+                            override_file_sorter = true,
+                            case_mode = 'smart_case',
+                        }
+                    },
 				},
 			})
 
@@ -377,6 +394,7 @@ require("lazy").setup({
 
 			vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>")
 			vim.keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<cr>")
+			vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<cr>")
 		end,
 	},
 	{
@@ -475,57 +493,6 @@ require("lazy").setup({
 		end,
 	},
 	{
-		"nvim-lualine/lualine.nvim",
-		dependencies = { "nvim-tree/nvim-web-devicons" },
-		event = { "VimEnter", "InsertEnter", "BufReadPre", "BufAdd", "BufNew", "BufReadPost" },
-		config = function()
-			local lualine = require("lualine")
-
-			local diagnostics = {
-				"diagnostics",
-				sources = { "nvim_diagnostic" },
-				sections = { "error", "warn" },
-				symbols = { error = " ", warn = " " },
-				colored = false,
-				always_visible = true,
-			}
-
-			local diff = {
-				"diff",
-				colored = false,
-				symbols = { added = " ", modified = " ", removed = " " },
-			}
-
-			lualine.setup({
-				options = {
-					globalstatus = true,
-					icons_enabled = true,
-					theme = "auto",
-					component_separators = { left = "", right = "" },
-					section_separators = { left = "", right = "" },
-					disabled_filetypes = { "alpha", "NVimTree" },
-					always_divide_middle = true,
-					ignore_focus = {
-						"dapui_watches",
-						"dapui_breakpoints",
-						"dapui_scopes",
-						"dapui_console",
-						"dapui_stacks",
-						"dap-repl",
-					},
-				},
-				sections = {
-					lualine_a = { "mode" },
-					lualine_b = { "branch" },
-					lualine_c = { diagnostics },
-					lualine_x = { diff },
-					lualine_y = { "location" },
-					lualine_z = { "progress" },
-				},
-			})
-		end,
-	},
-	{
 		"ThePrimeagen/harpoon",
 		branch = "harpoon2",
 		dependencies = { "nvim-lua/plenary.nvim" },
@@ -561,55 +528,13 @@ require("lazy").setup({
 			require("Comment").setup()
 		end,
 	},
-	{
-		"stevearc/conform.nvim",
-		event = { "BufWritePre" },
-		cmd = { "ConformInfo" },
-		keys = {
-			{
-				"<leader>fm",
-				function()
-					require("conform").format({ async = true, lsp_format = "fallback" })
-				end,
-				mode = "",
-			},
-		},
-		opts = {
-			notify_on_error = false,
-			formatters_by_ft = {
-				lua = { "stylua" },
-				tsx = { "prettierd", "prettier" },
-				ts = { "prettierd", "prettier" },
-				cpp = { "clang_format" },
-                h = { "clang_format" },
-			},
-			formatters = {
-				clang_format = {
-					prepend_args = { "--style=file", "--fallback-style=microsoft" },
-				},
-			},
-		},
-	},
-	{
-		"kristijanhusak/vim-dadbod-ui",
-		dependencies = {
-			{ "tpope/vim-dadbod", lazy = true },
-			{ "kristijanhusak/vim-dadbod-completion", ft = { "sql", "mysql", "plsql" }, lazy = true },
-		},
-		cmd = {
-			"DBUI",
-			"DBUIToggle",
-			"DBUIAddConnection",
-			"DBUIFindBuffer",
-		},
-		config = function()
-			vim.g.db_ui_use_nerd_fonts = 1
-		end,
-	},
     {
         "mbbill/undotree",
         config = function ()
             vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
         end
+    },
+    {
+        "tpope/vim-fugitive",
     },
 })
