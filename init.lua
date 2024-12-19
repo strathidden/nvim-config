@@ -78,6 +78,7 @@ require("lazy").setup({
         "EdenEast/nightfox.nvim",
         config = function ()
             vim.cmd.colorscheme("terafox")
+            vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
         end
     },
 	{
@@ -194,6 +195,7 @@ require("lazy").setup({
                 ["clangd"] = function ()
                     lspconfig["clangd"].setup({
                         cmd = { "clangd", "--header-insertion=never" },
+                        filetypes = { 'cpp', 'h', 'c', 'hpp' },
                         capabilities = capabilities,
                         on_attach = on_attach,
                     })
