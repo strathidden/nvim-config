@@ -75,10 +75,10 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
-        "EdenEast/nightfox.nvim",
+        "neanias/everforest-nvim",
         config = function ()
-            vim.cmd.colorscheme("terafox")
-            vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+            vim.cmd.colorscheme("everforest")
+            vim.o.background = "dark"
         end
     },
 	{
@@ -394,9 +394,8 @@ require("lazy").setup({
 
 			telescope.load_extension("fzf")
 
-			vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>")
-			vim.keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<cr>")
-			vim.keymap.set("n", "<leader>fb", "<cmd>Telescope buffers<cr>")
+			vim.keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>")
+			vim.keymap.set("n", "<leader>g", "<cmd>Telescope live_grep<cr>")
 		end,
 	},
 	{
@@ -506,7 +505,7 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>m", function()
 				harpoon:list():add()
 			end)
-			vim.keymap.set("n", "<leader>e", function()
+			vim.keymap.set("n", "<leader>v", function()
 				harpoon.ui:toggle_quick_menu(harpoon:list())
 			end)
 
@@ -532,7 +531,7 @@ require("lazy").setup({
 	},
     {
         "mbbill/undotree",
-        config = function ()
+        config = function()
             vim.keymap.set("n", "<leader>u", vim.cmd.UndotreeToggle)
         end
     },
