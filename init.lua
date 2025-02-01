@@ -6,11 +6,10 @@ vim.opt.splitright = true
 
 vim.opt.expandtab = true
 vim.opt.autoindent = true
+vim.opt.smartindent = true
 vim.opt.tabstop = 4
 vim.opt.softtabstop = 4
 vim.opt.shiftwidth = 4
-
-vim.opt.smartindent = true
 
 vim.opt.swapfile = false
 vim.opt.backup = false
@@ -33,6 +32,7 @@ vim.opt.termguicolors = true
 
 vim.g.mapleader = " "
 
+-- glsl lsp fix
 vim.filetype.add({
     extension = {
         vert = "glsl",
@@ -41,6 +41,7 @@ vim.filetype.add({
     },
 })
 
+-- line wrap fix
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
@@ -75,16 +76,17 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
-        "neanias/everforest-nvim",
-        config = function ()
-            vim.cmd.colorscheme("everforest")
-            vim.o.background = "dark"
+        'AlexvZyl/nordic.nvim',
+        lazy = false,
+        priority = 1000,
+        config = function()
+            require('nordic').load()
         end
     },
-	{
-		"nvim-treesitter/nvim-treesitter",
-		dependencies = {
-			"nvim-treesitter/nvim-treesitter-textobjects",
+    {
+        "nvim-treesitter/nvim-treesitter",
+        dependencies = {
+            "nvim-treesitter/nvim-treesitter-textobjects",
 		},
 		config = function()
 			require("nvim-treesitter.configs").setup({
@@ -485,6 +487,7 @@ require("lazy").setup({
 		dependencies = { "nvim-tree/nvim-web-devicons" },
 		config = function()
 			require("oil").setup({
+                delete_to_trash = true,
 				columns = { "icon" },
 				view_options = {
 					show_hidden = true,
@@ -537,5 +540,205 @@ require("lazy").setup({
     },
     {
         "tpope/vim-fugitive",
+    },
+    {
+        "akinsho/toggleterm.nvim",
+        config = function()
+            if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
+                vim.opt.shell = vim.fn.executable "pwsh" and "pwsh" or "powershell"
+                vim.opt.shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;"
+                vim.opt.shellredir = "-RedirectStandardOutput %s -NoNewWindow -Wait"
+                vim.opt.shellpipe = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
+                vim.opt.shellquote = ""
+                vim.opt.shellxquote = ""
+            end
+
+            require("toggleterm").setup({
+                size = 20,
+                open_mapping = [[<C-t>]],
+                hide_numbers = true,
+                shade_filetypes = {},
+                shade_terminals = true,
+                shading_factor = 2,
+                start_in_insert = true,
+                insert_mappings = true,
+                persist_size = true,
+                direction = "float",
+                close_on_exit = true,
+                shell = vim.o.shell,
+                float_opts = {
+                    border = "curved",
+                    winblend = 0,
+                    highlights = {
+                        border = "Normal",
+                        background = "Normal",
+                    },
+                },
+            })
+
+            function _G.set_terminal_keymaps()
+                local opts = {noremap = true}
+                vim.api.nvim_buf_set_keymap(0, 't', '<esc>', [[<C-\><C-n>]], opts)
+                vim.api.nvim_buf_set_keymap(0, 't', '<C-W>h', [[<C-\><C-n><C-W>h]], opts)
+                vim.api.nvim_buf_set_keymap(0, 't', '<C-W>j', [[<C-\><C-n><C-W>j]], opts)
+                vim.api.nvim_buf_set_keymap(0, 't', '<C-W>k', [[<C-\><C-n><C-W>k]], opts)
+                vim.api.nvim_buf_set_keymap(0, 't', '<C-W>l', [[<C-\><C-n><C-W>l]], opts)
+            end
+
+            vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
+        end
+    },
+    {
+        'nvim-lualine/lualine.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons'},
+        config = function()
+            local colors = {
+                bg       = '#08080800',
+                fg       = '#bbc2cf',
+                yellow   = '#ECBE7B',
+                cyan     = '#008080',
+                darkblue = '#081633',
+                green    = '#98be65',
+                orange   = '#FF8800',
+                violet   = '#a9a1e1',
+                blue     = '#51afef',
+                red      = '#ec5f67',
+            }
+            local conditions = {
+                buffer_not_empty = function()
+                    return vim.fn.empty(vim.fn.expand('%:t')) ~= 1
+                end,
+                hide_in_width = function()
+                    return vim.fn.winwidth(0) > 80
+                end,
+                check_git_workspace = function()
+                    local filepath = vim.fn.expand('%:p:h')
+                    local gitdir = vim.fn.finddir('.git', filepath .. ';')
+                    return gitdir and #gitdir > 0 and #gitdir < #filepath
+                end,
+            }
+            local config = {
+                options = {
+                    globalstatus = true,
+                    component_separators = '',
+                    section_separators = '',
+                    theme = {
+                        normal = { c = { fg = colors.fg, bg = colors.bg } },
+                        inactive = { c = { fg = colors.fg, bg = colors.bg } },
+                    },
+                },
+                sections = {
+                    lualine_a = {},
+                    lualine_b = {},
+                    lualine_y = {},
+                    lualine_z = {},
+
+                    lualine_c = {},
+                    lualine_x = {},
+                },
+                inactive_sections = {
+                    lualine_a = {},
+                    lualine_b = {},
+                    lualine_y = {},
+                    lualine_z = {},
+                    lualine_c = {},
+                    lualine_x = {},
+                    lualine_h = {},
+                },
+            }
+
+            local function ins_left(component)
+                table.insert(config.sections.lualine_c, component)
+            end
+
+            local function ins_right(component)
+                table.insert(config.sections.lualine_x, component)
+            end
+
+
+            ins_left {
+                'filename',
+                path = 2,
+                cond = conditions.buffer_not_empty,
+                color = { fg = colors.violet, gui = 'bold' },
+            }
+
+            ins_left {
+                'location',
+                padding = { left = 0, right = 0 },
+                color = { fg = colors.blue, gui = 'bold' },
+            }
+            ins_left {
+                'branch',
+                icon = "",
+                color = { fg = colors.violet, gui = 'bold' },
+                padding = { left = 0, right = 0 },
+            }
+
+            ins_left {
+                'diff',
+                symbols = { added = 'a', modified = 'm', removed = 'r' },
+                diff_color = {
+                    added = { fg = colors.green },
+                    modified = { fg = colors.orange },
+                    removed = { fg = colors.red },
+                },
+            }
+
+
+            ins_left {
+                'diagnostics',
+                sources = { 'nvim_diagnostic' },
+                symbols = { error = 'e', warn = 'w', info = 'i', hint = 'h' },
+                diagnostics_color = {
+                    color_error = { fg = colors.red },
+                    color_warn = { fg = colors.yellow },
+                    color_info = { fg = colors.cyan },
+                    color_hint = { fg = colors.cyan },
+                },
+            }
+
+            ins_left {
+                function()
+                    local msg = 'NoLsp'
+                    local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
+                    local clients = vim.lsp.get_active_clients()
+                    if next(clients) == nil then
+                        return msg
+                    end
+                    for _, client in ipairs(clients) do
+                        local filetypes = client.config.filetypes
+                        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
+                            return client.name
+                        end
+                    end
+                    return msg
+                end,
+                color = { fg = colors.violet, gui = 'bold' },
+                cond = conditions.hide_in_width,
+            }
+
+            ins_left {
+                'o:encoding',
+                fmt = string.upper,
+                color = { fg = colors.green, gui = 'bold' },
+                cond = conditions.hide_in_width,
+            }
+
+            ins_left {
+                'fileformat',
+                fmt = string.upper,
+                icons_enabled = false,
+                color = { fg = colors.green, gui = 'bold' },
+                cond = conditions.hide_in_width,
+            }
+
+            ins_right {
+                'datetime',
+                color = { fg = colors.violet, gui = 'bold' },
+            }
+
+            require("lualine").setup(config)
+        end
     },
 })
