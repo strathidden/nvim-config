@@ -545,7 +545,7 @@ require("lazy").setup({
         "akinsho/toggleterm.nvim",
         config = function()
             if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
-                vim.opt.shell = vim.fn.executable "pwsh" and "pwsh" or "powershell"
+                vim.opt.shell = vim.fn.executable "pwsh" and "pwsh -NoLogo" or "powershell"
                 vim.opt.shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;"
                 vim.opt.shellredir = "-RedirectStandardOutput %s -NoNewWindow -Wait"
                 vim.opt.shellpipe = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
@@ -658,7 +658,7 @@ require("lazy").setup({
 
             ins_left {
                 'filename',
-                path = 2,
+                path = 1,
                 cond = conditions.buffer_not_empty,
                 color = { fg = colors.violet, gui = 'bold' },
             }
@@ -698,40 +698,40 @@ require("lazy").setup({
                 },
             }
 
-            ins_left {
-                function()
-                    local msg = 'NoLsp'
-                    local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
-                    local clients = vim.lsp.get_active_clients()
-                    if next(clients) == nil then
-                        return msg
-                    end
-                    for _, client in ipairs(clients) do
-                        local filetypes = client.config.filetypes
-                        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-                            return client.name
-                        end
-                    end
-                    return msg
-                end,
-                color = { fg = colors.violet, gui = 'bold' },
-                cond = conditions.hide_in_width,
-            }
+            -- ins_left {
+            --     function()
+            --         local msg = 'NoLsp'
+            --         local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
+            --         local clients = vim.lsp.get_active_clients()
+            --         if next(clients) == nil then
+            --             return msg
+            --         end
+            --         for _, client in ipairs(clients) do
+            --             local filetypes = client.config.filetypes
+            --             if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
+            --                 return client.name
+            --             end
+            --         end
+            --         return msg
+            --     end,
+            --     color = { fg = colors.violet, gui = 'bold' },
+            --     cond = conditions.hide_in_width,
+            -- }
 
-            ins_left {
-                'o:encoding',
-                fmt = string.upper,
-                color = { fg = colors.green, gui = 'bold' },
-                cond = conditions.hide_in_width,
-            }
+            -- ins_left {
+            --     'o:encoding',
+            --     fmt = string.upper,
+            --     color = { fg = colors.green, gui = 'bold' },
+            --     cond = conditions.hide_in_width,
+            -- }
 
-            ins_left {
-                'fileformat',
-                fmt = string.upper,
-                icons_enabled = false,
-                color = { fg = colors.green, gui = 'bold' },
-                cond = conditions.hide_in_width,
-            }
+            -- ins_left {
+            --     'fileformat',
+            --     fmt = string.upper,
+            --     icons_enabled = false,
+            --     color = { fg = colors.green, gui = 'bold' },
+            --     cond = conditions.hide_in_width,
+            -- }
 
             ins_right {
                 'datetime',
@@ -739,6 +739,44 @@ require("lazy").setup({
             }
 
             require("lualine").setup(config)
+        end
+    },
+    {
+        'nvim-tree/nvim-tree.lua',
+        dependencies = {
+            'nvim-tree/nvim-web-devicons',
+        },
+        config = function()
+            vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>")
+
+            require("nvim-tree").setup({
+                disable_netrw = true,
+                hijack_netrw = true,
+                respect_buf_cwd = true,
+                sync_root_with_cwd = true,
+                diagnostics = {
+                    enable = true,
+                },
+                git = {
+                    enable = true,
+                    ignore = false,
+                },
+                renderer = {
+                    group_empty = false,
+                    full_name = true,
+                    indent_width = 1,
+                    special_files = { "go.mod", ".git", ".gitignore" },
+                    highlight_git = true,
+                    highlight_modified = "icon",
+                },
+                filters = {
+                    dotfiles = false,
+                },
+                view = {
+                    side = "right",
+                    signcolumn = "no",
+                },
+            })
         end
     },
 })
