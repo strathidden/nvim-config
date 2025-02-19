@@ -15,7 +15,12 @@ vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undofile = true
 
+vim.opt.hlsearch = false
+vim.opt.incsearch = true
+
 vim.opt.signcolumn = "no"
+
+vim.opt.updatetime = 50
 
 vim.opt.clipboard = "unnamedplus"
 
@@ -46,6 +51,19 @@ vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = tr
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setqflist)
+
+vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
+vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
+
+vim.keymap.set("n", "J", "mzJ`z")
+vim.keymap.set("n", "<C-d>", "<C-d>zz")
+vim.keymap.set("n", "<C-u>", "<C-u>zz")
+vim.keymap.set("n", "n", "nzzzv")
+vim.keymap.set("n", "N", "Nzzzv")
+
+vim.keymap.set("x", "<leader>p", "\"_dP")
+
+vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
 
 vim.api.nvim_create_autocmd('BufReadPost', {
     group = vim.api.nvim_create_augroup('last_loc', { clear = true }),
@@ -194,14 +212,29 @@ require("lazy").setup({
 						on_attach = on_attach,
 					})
 				end,
-                ["clangd"] = function ()
+                ["clangd"] = function()
                     lspconfig["clangd"].setup({
                         cmd = { "clangd", "--header-insertion=never" },
                         filetypes = { 'cpp', 'h', 'c', 'hpp' },
                         capabilities = capabilities,
                         on_attach = on_attach,
                     })
-                end
+                end,
+                ["rust-analyzer"] = function ()
+                    require("rust_analyzer").setup({
+                        capabilities = capabilities,
+                        on_attach = on_attach,
+                        filetypes = {"rust"},
+                        root_dir = require("lspconfig").util.root_pattern("Cargo.toml"),
+                        settings = {
+                            ['rust-analyzer'] = {
+                                cargo = {
+                                    allFeatures = true,
+                                },
+                            },
+                        },
+                    })
+                end,
 			})
 		end,
 	},
@@ -508,7 +541,7 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>m", function()
 				harpoon:list():add()
 			end)
-			vim.keymap.set("n", "<leader>v", function()
+			vim.keymap.set("n", "<leader>e", function()
 				harpoon.ui:toggle_quick_menu(harpoon:list())
 			end)
 
@@ -698,40 +731,40 @@ require("lazy").setup({
                 },
             }
 
-            -- ins_left {
-            --     function()
-            --         local msg = 'NoLsp'
-            --         local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
-            --         local clients = vim.lsp.get_active_clients()
-            --         if next(clients) == nil then
-            --             return msg
-            --         end
-            --         for _, client in ipairs(clients) do
-            --             local filetypes = client.config.filetypes
-            --             if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-            --                 return client.name
-            --             end
-            --         end
-            --         return msg
-            --     end,
-            --     color = { fg = colors.violet, gui = 'bold' },
-            --     cond = conditions.hide_in_width,
-            -- }
+            ins_left {
+                function()
+                    local msg = 'NoLsp'
+                    local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
+                    local clients = vim.lsp.get_active_clients()
+                    if next(clients) == nil then
+                        return msg
+                    end
+                    for _, client in ipairs(clients) do
+                        local filetypes = client.config.filetypes
+                        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
+                            return client.name
+                        end
+                    end
+                    return msg
+                end,
+                color = { fg = colors.violet, gui = 'bold' },
+                cond = conditions.hide_in_width,
+            }
 
-            -- ins_left {
-            --     'o:encoding',
-            --     fmt = string.upper,
-            --     color = { fg = colors.green, gui = 'bold' },
-            --     cond = conditions.hide_in_width,
-            -- }
+            ins_left {
+                'o:encoding',
+                fmt = string.upper,
+                color = { fg = colors.green, gui = 'bold' },
+                cond = conditions.hide_in_width,
+            }
 
-            -- ins_left {
-            --     'fileformat',
-            --     fmt = string.upper,
-            --     icons_enabled = false,
-            --     color = { fg = colors.green, gui = 'bold' },
-            --     cond = conditions.hide_in_width,
-            -- }
+            ins_left {
+                'fileformat',
+                fmt = string.upper,
+                icons_enabled = false,
+                color = { fg = colors.green, gui = 'bold' },
+                cond = conditions.hide_in_width,
+            }
 
             ins_right {
                 'datetime',
@@ -739,44 +772,6 @@ require("lazy").setup({
             }
 
             require("lualine").setup(config)
-        end
-    },
-    {
-        'nvim-tree/nvim-tree.lua',
-        dependencies = {
-            'nvim-tree/nvim-web-devicons',
-        },
-        config = function()
-            vim.keymap.set("n", "<leader>e", ":NvimTreeToggle<CR>")
-
-            require("nvim-tree").setup({
-                disable_netrw = true,
-                hijack_netrw = true,
-                respect_buf_cwd = true,
-                sync_root_with_cwd = true,
-                diagnostics = {
-                    enable = true,
-                },
-                git = {
-                    enable = true,
-                    ignore = false,
-                },
-                renderer = {
-                    group_empty = false,
-                    full_name = true,
-                    indent_width = 1,
-                    special_files = { "go.mod", ".git", ".gitignore" },
-                    highlight_git = true,
-                    highlight_modified = "icon",
-                },
-                filters = {
-                    dotfiles = false,
-                },
-                view = {
-                    side = "right",
-                    signcolumn = "no",
-                },
-            })
         end
     },
 })
