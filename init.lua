@@ -63,7 +63,9 @@ vim.keymap.set("n", "N", "Nzzzv")
 
 vim.keymap.set("x", "<leader>p", "\"_dP")
 
-vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gI<Left><Left><Left>]])
+vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gc<Left><Left><Left>]])
+
+vim.keymap.set("n", "<leader>w", "<cmd>w<CR>")
 
 vim.api.nvim_create_autocmd('BufReadPost', {
     group = vim.api.nvim_create_augroup('last_loc', { clear = true }),
@@ -94,11 +96,11 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
-        'AlexvZyl/nordic.nvim',
+        'RRethy/base16-nvim',
         lazy = false,
         priority = 1000,
         config = function()
-            require('nordic').load()
+            vim.cmd.colorscheme("base16-catppuccin")
         end
     },
     {
@@ -220,21 +222,6 @@ require("lazy").setup({
                         on_attach = on_attach,
                     })
                 end,
-                ["rust-analyzer"] = function ()
-                    require("rust_analyzer").setup({
-                        capabilities = capabilities,
-                        on_attach = on_attach,
-                        filetypes = {"rust"},
-                        root_dir = require("lspconfig").util.root_pattern("Cargo.toml"),
-                        settings = {
-                            ['rust-analyzer'] = {
-                                cargo = {
-                                    allFeatures = true,
-                                },
-                            },
-                        },
-                    })
-                end,
 			})
 		end,
 	},
@@ -265,49 +252,21 @@ require("lazy").setup({
 		end,
 	},
 	{
-		"L3MON4D3/LuaSnip",
-		config = function()
-			local ls = require("luasnip")
-
-			vim.keymap.set({ "i" }, "<C-K>", function()
-				ls.expand()
-			end, { silent = true })
-			vim.keymap.set({ "i", "s" }, "<C-L>", function()
-				ls.jump(1)
-			end, { silent = true })
-			vim.keymap.set({ "i", "s" }, "<C-H>", function()
-				ls.jump(-1)
-			end, { silent = true })
-		end,
-	},
-	{
 		"hrsh7th/nvim-cmp",
 		event = "InsertEnter",
 		dependencies = {
 			"hrsh7th/cmp-buffer",
 			"hrsh7th/cmp-path",
-			"L3MON4D3/LuaSnip",
-			"saadparwaiz1/cmp_luasnip",
-			"rafamadriz/friendly-snippets",
 			"onsails/lspkind.nvim",
 		},
 		config = function()
 			local cmp = require("cmp")
 
-			local luasnip = require("luasnip")
-
 			local lspkind = require("lspkind")
-
-			require("luasnip.loaders.from_vscode").lazy_load()
 
 			cmp.setup({
 				completion = {
 					completeopt = "menu,menuone,preview,noselect",
-				},
-				snippet = {
-					expand = function(args)
-						luasnip.lsp_expand(args.body)
-					end,
 				},
 				mapping = cmp.mapping.preset.insert({
 					--["<S-Tab>"] = cmp.mapping.select_prev_item(), -- previous suggestion
@@ -318,13 +277,9 @@ require("lazy").setup({
 					--["<CR>"] = cmp.mapping.confirm({ select = true }),
 					["<CR>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
-							if luasnip.expandable() then
-								luasnip.expand()
-							else
-								cmp.confirm({
-									select = true,
-								})
-							end
+                            cmp.confirm({
+                                select = true,
+                            })
 						else
 							fallback()
 						end
@@ -333,8 +288,6 @@ require("lazy").setup({
 					["<Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_next_item()
-						elseif luasnip.locally_jumpable(1) then
-							luasnip.jump(1)
 						else
 							fallback()
 						end
@@ -343,8 +296,6 @@ require("lazy").setup({
 					["<S-Tab>"] = cmp.mapping(function(fallback)
 						if cmp.visible() then
 							cmp.select_prev_item()
-						elseif luasnip.locally_jumpable(-1) then
-							luasnip.jump(-1)
 						else
 							fallback()
 						end
@@ -352,7 +303,6 @@ require("lazy").setup({
 				}),
 				sources = cmp.config.sources({
 					{ name = "nvim_lsp" },
-					{ name = "luasnip" }, -- snippets
 					{ name = "buffer" }, -- text within current buffer
 					{ name = "path" }, -- file system paths
 				}),
@@ -587,7 +537,7 @@ require("lazy").setup({
             end
 
             require("toggleterm").setup({
-                size = 20,
+                size = 15,
                 open_mapping = [[<C-t>]],
                 hide_numbers = true,
                 shade_filetypes = {},
@@ -596,7 +546,7 @@ require("lazy").setup({
                 start_in_insert = true,
                 insert_mappings = true,
                 persist_size = true,
-                direction = "float",
+                direction = "float", -- horizontal, vertical, float
                 close_on_exit = true,
                 shell = vim.o.shell,
                 float_opts = {
@@ -772,6 +722,12 @@ require("lazy").setup({
             }
 
             require("lualine").setup(config)
+        end
+    },
+    {
+        "laytan/cloak.nvim",
+        config = function()
+            require("cloak").setup({})
         end
     },
 })
