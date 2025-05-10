@@ -207,18 +207,20 @@ require("lazy").setup({
 			end
 
 			mason_lspconfig.setup({
-				-- default handler for installed servers
-                automatic_enable = true,
-
-                ["clangd"] = function()
-                    lspconfig["clangd"].setup({
-                        cmd = { "clangd", "--header-insertion=never" },
-                        filetypes = { 'cpp', 'h', 'c', 'hpp' },
-                        capabilities = capabilities,
-                        on_attach = on_attach,
-                    })
-                end,
+                automatic_enable = {
+                    exclude = {
+                        "clangd",
+                    },
+                },
+                capabilities = capabilities,
+                on_attach = on_attach,
 			})
+            lspconfig.clangd.setup({
+                cmd = { "clangd", "--header-insertion=never" },
+                filetypes = { 'cpp', 'h', 'c', 'hpp' },
+                capabilities = capabilities,
+                on_attach = on_attach,
+            })
 		end,
 	},
 	{
@@ -243,8 +245,6 @@ require("lazy").setup({
 					},
 				},
 			})
-
-			mason_lspconfig.setup()
 		end,
 	},
 	{
