@@ -206,14 +206,10 @@ require("lazy").setup({
 				vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
 			end
 
-			mason_lspconfig.setup_handlers({
+			mason_lspconfig.setup({
 				-- default handler for installed servers
-				function(server_name)
-					lspconfig[server_name].setup({
-						capabilities = capabilities,
-						on_attach = on_attach,
-					})
-				end,
+                automatic_enable = true,
+
                 ["clangd"] = function()
                     lspconfig["clangd"].setup({
                         cmd = { "clangd", "--header-insertion=never" },
@@ -685,7 +681,7 @@ require("lazy").setup({
                 function()
                     local msg = 'NoLsp'
                     local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
-                    local clients = vim.lsp.get_active_clients()
+                    local clients = vim.lsp.get_clients()
                     if next(clients) == nil then
                         return msg
                     end
