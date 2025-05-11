@@ -100,7 +100,7 @@ require("lazy").setup({
         lazy = false,
         priority = 1000,
         config = function()
-            vim.cmd.colorscheme("base16-gruvbox-material-dark-medium")
+            vim.cmd.colorscheme("base16-gruvbox-material-dark-soft")
         end
     },
     {
@@ -231,9 +231,6 @@ require("lazy").setup({
 		config = function()
 			-- import mason
 			local mason = require("mason")
-
-			-- import mason-lspconfig
-			local mason_lspconfig = require("mason-lspconfig")
 
 			-- enable mason and configure icons
 			mason.setup({
@@ -379,88 +376,6 @@ require("lazy").setup({
 			vim.keymap.set("n", "<leader>g", "<cmd>Telescope live_grep<cr>")
 		end,
 	},
-	-- {
-	-- 	"nvimdev/dashboard-nvim",
-	-- 	dependencies = "nvim-tree/nvim-web-devicons",
-	-- 	event = "VimEnter",
-	-- 	config = function()
-	-- 		local dashboard = require("dashboard")
-	-- 		dashboard.setup({
-	-- 			theme = "doom",
-	-- 			config = {
-	-- 				header = {
-	-- 					[[                                                    ]],
-	-- 					[[                                                    ]],
-	-- 					[[                                                    ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣤⡴⠂⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣴⣿⠟⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣶⣿⣿⣿⡅⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣀⣀⣀⣀⣀⣀⣀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣤⣤⣤⣤⣴⣿⣿⣿⣿⣯⣤⣶⣶⣾⣿⣶⣶⣿⣿⣿⣿⣿⡿⠿⠟⠛⠉⠉⠀⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠐⠉⠁⠈⣹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣶⣶⣶⠶⠶⠦⠄⠀⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⣾⡿⠟⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣦⡀⠀⠀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣴⣾⣿⣟⣡⣤⣾⣿⣿⣿⣿⣿⣿⢏⠉⠛⣿⣿⣿⣿⣿⣿⣿⣿⣿⡻⢿⣿⣿⣦⡀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⣀⣤⣶⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠃⠈⠻⡄⠁⠀⢸⣿⣿⣿⣿⣿⣿⣿⣿⣿⣆⠈⠙⠻⣿⣆⠀⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⢰⣿⣿⣿⣿⡿⠛⠉⠉⠉⠛⠛⠛⠛⠋⠁⠀⠀⠀⠁⠀⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣧⠀⠀⠈⠙⢧⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠙⠿⠟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣀⣤⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡆⠀⠀⠀⠀⠁⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢻⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠙⣿⣿⣿⣷⠀⠀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⢀⣤⣴⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠟⠁⠀⠀⢹⣿⣿⣿⠀⠀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⢀⣤⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠟⠋⠁⠀⠀⠀⠀⠈⣿⣿⡟⠀⠀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⠀⠀⠀⣴⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠟⠛⢋⣩⡿⠿⠿⠟⠛⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡟⠁⠀⠀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⠀⢀⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠠⣄⣀⡀⠀⠀⠀⠀⠀⠐⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⠀⣾⣿⣿⣿⣿⣿⣿⣿⠻⣿⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠻⢿⣶⣤⣄⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⢰⣿⣿⣿⣿⣿⣿⣿⣿⡄⠙⢿⣄⠀⠀⠀⠀⠀⠀⠀⠀⠠⣤⣀⠀⠀⠀⠠⣄⣀⣀⡉⢻⣿⣿⣿⣶⣄⡀⠀⠀⠀⠀⠀⠀⠀      ]],
-	-- 					[[⠘⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣿⣿⣦⣤⣤⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣷⣄⡀⠀⠀⠀⠀      ]],
-	-- 					[[⠀⢻⡟⠙⣿⣿⣿⣿⣿⣿⣿⣿⣿⠿⠛⠛⠋⠉⠀⠀⢀⣠⣾⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣦⡀⠀⠀      ]],
-	-- 					[[⠀⠀⠃⠀⢹⣿⣿⣿⣿⣿⣿⣿⣿⣿⣶⣶⣶⣶⣶⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡟⠁⠀⠀⠀⠀⠀⠈⠉⠻⢿⣿⣿⣿⣷⡄⠀      ]],
-	-- 					[[⠀⠀⠀⠀⢸⣿⣿⡟⠙⠿⣿⣿⣿⣿⣿⣿⣿⣿⣿⣿⡿⠿⠛⠛⣿⣿⣿⣿⣿⣧⣀⣀⡄⠀⠀⠀⠀⠀⠀⠈⣿⡿⣿⣿⣷⠀      ]],
-	-- 					[[⠀⠀⠀⠀⢸⣿⡿⠁⠀⠀⠀⠙⠻⠿⣟⠻⢿⣿⣿⣿⣷⣦⡀⠀⠈⠻⢿⣿⣿⣭⣉⡉⠀⠀⠀⠀⠀⠀⠀⠀⠘⠀⠸⣿⣿⡄      ]],
-	-- 					[[⠀⠀⠀⠀⣸⡟⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠉⠛⢿⣿⣿⣦⡀⠀⠀⠀⠉⠉⠉⠉⠉⠉⠁⠀⠀⠀⠀⠀⠀⠀⠀⣿⣿⠁      ]],
-	-- 					[[⠀⠀⠀⠠⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠙⢿⣿⣆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣿⡟⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠙⢿⡆⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢰⠟⠀⠀      ]],
-	-- 					[[⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠁⠀⠀⠀      ]],
-	-- 					[[                                                    ]],
-	-- 				},
-	-- 				center = {
-	-- 					{
-	-- 						action = "Telescope find_files",
-	-- 						desc = "Find Files",
-	-- 						icon = "   ",
-	-- 						key = "f",
-	-- 						key_format = "%s",
-	-- 					},
-	-- 					{
-	-- 						action = "ene",
-	-- 						desc = "New File",
-	-- 						icon = "   ",
-	-- 						key = "e",
-	-- 						key_format = "%s",
-	-- 					},
-	-- 					{
-	-- 						action = "Telescope oldfiles",
-	-- 						desc = "Recent Files",
-	-- 						icon = "   ",
-	-- 						key = "r",
-	-- 						key_format = "%s",
-	-- 					},
-	-- 					{
-	-- 						action = "edit ~/Appdata/Local/nvim/init.lua",
-	-- 						desc = "Config",
-	-- 						icon = "   ",
-	-- 						key = "c",
-	-- 						key_format = "%s",
-	-- 					},
-	-- 					{
-	-- 						action = "Lazy update",
-	-- 						desc = "Update",
-	-- 						icon = "   ",
-	-- 						key = "u",
-	-- 						key_format = "%s",
-	-- 					},
-	-- 				},
-	-- 			},
-	-- 		})
-	-- 	end,
-	-- },
 	{
 		"stevearc/oil.nvim",
 		dependencies = { "nvim-tree/nvim-web-devicons" },
@@ -519,53 +434,6 @@ require("lazy").setup({
     },
     {
         "tpope/vim-fugitive",
-    },
-    {
-        "akinsho/toggleterm.nvim",
-        config = function()
-            if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
-                vim.opt.shell = vim.fn.executable "pwsh" and "pwsh -NoLogo" or "powershell"
-                vim.opt.shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;"
-                vim.opt.shellredir = "-RedirectStandardOutput %s -NoNewWindow -Wait"
-                vim.opt.shellpipe = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
-                vim.opt.shellquote = ""
-                vim.opt.shellxquote = ""
-            end
-
-            require("toggleterm").setup({
-                size = 15,
-                open_mapping = [[<C-t>]],
-                hide_numbers = true,
-                shade_filetypes = {},
-                shade_terminals = true,
-                shading_factor = 2,
-                start_in_insert = true,
-                insert_mappings = true,
-                persist_size = true,
-                direction = "float", -- horizontal, vertical, float
-                close_on_exit = true,
-                shell = vim.o.shell,
-                float_opts = {
-                    border = "curved",
-                    winblend = 0,
-                    highlights = {
-                        border = "Normal",
-                        background = "Normal",
-                    },
-                },
-            })
-
-            function _G.set_terminal_keymaps()
-                local opts = {noremap = true}
-                vim.api.nvim_buf_set_keymap(0, 't', '<esc>', [[<C-\><C-n>]], opts)
-                vim.api.nvim_buf_set_keymap(0, 't', '<C-W>h', [[<C-\><C-n><C-W>h]], opts)
-                vim.api.nvim_buf_set_keymap(0, 't', '<C-W>j', [[<C-\><C-n><C-W>j]], opts)
-                vim.api.nvim_buf_set_keymap(0, 't', '<C-W>k', [[<C-\><C-n><C-W>k]], opts)
-                vim.api.nvim_buf_set_keymap(0, 't', '<C-W>l', [[<C-\><C-n><C-W>l]], opts)
-            end
-
-            vim.cmd('autocmd! TermOpen term://* lua set_terminal_keymaps()')
-        end
     },
     {
         'nvim-lualine/lualine.nvim',
@@ -726,4 +594,105 @@ require("lazy").setup({
             require("cloak").setup({})
         end
     },
+    {
+        "kawre/leetcode.nvim",
+        dependencies = {
+            "nvim-telescope/telescope.nvim",
+            -- "ibhagwan/fzf-lua",
+            "nvim-lua/plenary.nvim",
+            "MunifTanjim/nui.nvim",
+        },
+        opts = {
+            ---@type string
+            arg = "leetcode.nvim",
+
+            ---@type lc.lang
+            lang = "cpp",
+
+            cn = { -- leetcode.cn
+                enabled = false, ---@type boolean
+                translator = true, ---@type boolean
+                translate_problems = true, ---@type boolean
+            },
+
+            ---@type lc.storage
+            storage = {
+                home = vim.fn.stdpath("data") .. "/leetcode",
+                cache = vim.fn.stdpath("cache") .. "/leetcode",
+            },
+
+            ---@type table<string, boolean>
+            plugins = {
+                non_standalone = false,
+            },
+
+            ---@type boolean
+            logging = true,
+
+            injector = {}, ---@type table<lc.lang, lc.inject>
+
+            cache = {
+                update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
+            },
+
+            console = {
+                open_on_runcode = true, ---@type boolean
+
+                dir = "row", ---@type lc.direction
+
+                size = { ---@type lc.size
+                    width = "90%",
+                    height = "75%",
+                },
+
+                result = {
+                    size = "60%", ---@type lc.size
+                },
+
+                testcase = {
+                    virt_text = true, ---@type boolean
+
+                    size = "40%", ---@type lc.size
+                },
+            },
+
+            description = {
+                position = "left", ---@type lc.position
+
+                width = "40%", ---@type lc.size
+
+                show_stats = true, ---@type boolean
+            },
+
+            ---@type lc.picker
+            picker = { provider = nil },
+
+            hooks = {
+                ---@type fun()[]
+                ["enter"] = {},
+
+                ---@type fun(question: lc.ui.Question)[]
+                ["question_enter"] = {},
+
+                ---@type fun()[]
+                ["leave"] = {},
+            },
+
+            keys = {
+                toggle = { "q" }, ---@type string|string[]
+                confirm = { "<CR>" }, ---@type string|string[]
+
+                reset_testcases = "r", ---@type string
+                use_testcase = "U", ---@type string
+                focus_testcases = "H", ---@type string
+                focus_result = "L", ---@type string
+            },
+
+            ---@type lc.highlights
+            theme = {},
+
+            ---@type boolean
+            image_support = false,
+        }
+    }
 })
