@@ -51,6 +51,7 @@ vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = tr
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
 vim.keymap.set('n', '<leader>q', vim.diagnostic.setqflist)
+vim.keymap.set('n', '<leader>qn', vim.diagnostic.goto_next)
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
@@ -64,8 +65,6 @@ vim.keymap.set("n", "N", "Nzzzv")
 vim.keymap.set("x", "<leader>p", "\"_dP")
 
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gc<Left><Left><Left>]])
-
-vim.keymap.set("n", "<leader>w", "<cmd>w<CR>")
 
 vim.api.nvim_create_autocmd('BufReadPost', {
     group = vim.api.nvim_create_augroup('last_loc', { clear = true }),
@@ -594,105 +593,4 @@ require("lazy").setup({
             require("cloak").setup({})
         end
     },
-    {
-        "kawre/leetcode.nvim",
-        dependencies = {
-            "nvim-telescope/telescope.nvim",
-            -- "ibhagwan/fzf-lua",
-            "nvim-lua/plenary.nvim",
-            "MunifTanjim/nui.nvim",
-        },
-        opts = {
-            ---@type string
-            arg = "leetcode.nvim",
-
-            ---@type lc.lang
-            lang = "cpp",
-
-            cn = { -- leetcode.cn
-                enabled = false, ---@type boolean
-                translator = true, ---@type boolean
-                translate_problems = true, ---@type boolean
-            },
-
-            ---@type lc.storage
-            storage = {
-                home = vim.fn.stdpath("data") .. "/leetcode",
-                cache = vim.fn.stdpath("cache") .. "/leetcode",
-            },
-
-            ---@type table<string, boolean>
-            plugins = {
-                non_standalone = false,
-            },
-
-            ---@type boolean
-            logging = true,
-
-            injector = {}, ---@type table<lc.lang, lc.inject>
-
-            cache = {
-                update_interval = 60 * 60 * 24 * 7, ---@type integer 7 days
-            },
-
-            console = {
-                open_on_runcode = true, ---@type boolean
-
-                dir = "row", ---@type lc.direction
-
-                size = { ---@type lc.size
-                    width = "90%",
-                    height = "75%",
-                },
-
-                result = {
-                    size = "60%", ---@type lc.size
-                },
-
-                testcase = {
-                    virt_text = true, ---@type boolean
-
-                    size = "40%", ---@type lc.size
-                },
-            },
-
-            description = {
-                position = "left", ---@type lc.position
-
-                width = "40%", ---@type lc.size
-
-                show_stats = true, ---@type boolean
-            },
-
-            ---@type lc.picker
-            picker = { provider = nil },
-
-            hooks = {
-                ---@type fun()[]
-                ["enter"] = {},
-
-                ---@type fun(question: lc.ui.Question)[]
-                ["question_enter"] = {},
-
-                ---@type fun()[]
-                ["leave"] = {},
-            },
-
-            keys = {
-                toggle = { "q" }, ---@type string|string[]
-                confirm = { "<CR>" }, ---@type string|string[]
-
-                reset_testcases = "r", ---@type string
-                use_testcase = "U", ---@type string
-                focus_testcases = "H", ---@type string
-                focus_result = "L", ---@type string
-            },
-
-            ---@type lc.highlights
-            theme = {},
-
-            ---@type boolean
-            image_support = false,
-        }
-    }
 })
