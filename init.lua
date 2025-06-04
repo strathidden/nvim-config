@@ -99,7 +99,7 @@ require("lazy").setup({
         lazy = false,
         priority = 1000,
         config = function()
-            vim.cmd.colorscheme("base16-gruvbox-material-dark-soft")
+            vim.cmd.colorscheme("base16-onedark")
         end
     },
     {
