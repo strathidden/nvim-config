@@ -593,4 +593,10 @@ require("lazy").setup({
             require("cloak").setup({})
         end
     },
+    {
+        "ThePrimeagen/refactoring.nvim",
+        config = function()
+            require('refactoring').setup({})
+        end
+    },
 })
