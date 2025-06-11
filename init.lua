@@ -99,7 +99,7 @@ require("lazy").setup({
         lazy = false,
         priority = 1000,
         config = function()
-            vim.cmd.colorscheme("base16-onedark")
+            vim.cmd.colorscheme("base16-tomorrow-night")
         end
     },
     {
@@ -439,7 +439,7 @@ require("lazy").setup({
         dependencies = { 'nvim-tree/nvim-web-devicons'},
         config = function()
             local colors = {
-                bg       = '#08080800',
+                bg       = '#1d1f21',
                 fg       = '#bbc2cf',
                 yellow   = '#ECBE7B',
                 cyan     = '#008080',
