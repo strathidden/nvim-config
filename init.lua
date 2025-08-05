@@ -66,9 +66,6 @@ vim.keymap.set("x", "<leader>p", "\"_dP")
 
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gc<Left><Left><Left>]])
 
-vim.opt.background = "light"
-vim.cmd.colorscheme("quiet")
-
 vim.api.nvim_create_autocmd('BufReadPost', {
     group = vim.api.nvim_create_augroup('last_loc', { clear = true }),
     callback = function()
@@ -97,6 +94,12 @@ end
 vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
+    {
+        "dgox16/oldworld.nvim",
+        config = function()
+            vim.cmd.colorscheme("oldworld")
+        end
+    },
     {
         "nvim-treesitter/nvim-treesitter",
         dependencies = {
@@ -253,7 +256,7 @@ require("lazy").setup({
 
 			cmp.setup({
 				completion = {
-					completeopt = "menu,menuone,preview,noselect",
+					completeopt = "menu,menuone,noinsert,preview",
 				},
 				mapping = cmp.mapping.preset.insert({
 					--["<S-Tab>"] = cmp.mapping.select_prev_item(), -- previous suggestion
