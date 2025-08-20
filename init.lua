@@ -95,9 +95,12 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
-        "dgox16/oldworld.nvim",
+        "sainnhe/sonokai",
         config = function()
-            vim.cmd.colorscheme("oldworld")
+            vim.g.sonokai_enable_italic = 1
+            vim.g.sonokai_style = 'shusia'
+            vim.g.sonokai_better_performance = 1
+            vim.cmd.colorscheme("sonokai")
         end
     },
     {
