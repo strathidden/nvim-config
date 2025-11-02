@@ -50,8 +50,8 @@ vim.filetype.add({
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
-vim.keymap.set('n', '<leader>q', vim.diagnostic.setqflist)
-vim.keymap.set('n', '<leader>qn', vim.diagnostic.goto_next)
+-- vim.keymap.set('n', '<leader>q', vim.diagnostic.setqflist)
+-- vim.keymap.set('n', '<leader>qn', vim.diagnostic.goto_next)
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
@@ -62,10 +62,41 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz")
 vim.keymap.set("n", "n", "nzzzv")
 vim.keymap.set("n", "N", "Nzzzv")
 
+vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left split" })
+vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to below split" })
+vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to above split" })
+vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right split" })
+
+vim.keymap.set("v", "<", "<gv", { desc = "(V) Indent to left" })
+vim.keymap.set("v", ">", ">gv", { desc = "(V) Indent to right" })
+
 vim.keymap.set("x", "<leader>p", "\"_dP")
 
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gc<Left><Left><Left>]])
 
+-- don't auto comment new line
+vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=cro]] })
+
+-- to make border as same as neovim ColorScheme
+vim.api.nvim_create_autocmd({ "UIEnter", "ColorScheme" }, {
+  callback = function()
+    local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
+    if not normal.bg then
+      return
+    end
+    io.write(string.format("\027Ptmux;\027\027]11;#%06x\007\027\\", normal.bg))
+    io.write(string.format("\027]11;#%06x\027\\", normal.bg))
+  end,
+})
+
+vim.api.nvim_create_autocmd("UILeave", {
+  callback = function()
+    io.write("\027Ptmux;\027\027]111;\007\027\\")
+    io.write("\027]111\027\\")
+  end,
+})
+
+-- go to last location when opening a buffer
 vim.api.nvim_create_autocmd('BufReadPost', {
     group = vim.api.nvim_create_augroup('last_loc', { clear = true }),
     callback = function()
@@ -76,6 +107,12 @@ vim.api.nvim_create_autocmd('BufReadPost', {
         end
     end,
 })
+
+-- auto close
+vim.api.nvim_create_autocmd("FileType", { pattern = "man", command = [[nnoremap <buffer><silent> q :quit<CR>]] })
+
+-- resize neovim split when terminal is resized
+vim.api.nvim_command("autocmd VimResized * wincmd =")
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -95,15 +132,9 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
-        "Mofiqul/dracula.nvim",
+        "Yazeed1s/oh-lucy.nvim",
         config = function()
-            vim.cmd.colorscheme("dracula")
-   --          vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-			-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-			-- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
-			-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
-			-- vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
-   --          vim.api.nvim_set_hl(0, "FloatBorder", { bg = "none" })
+            vim.cmd.colorscheme("oh-lucy")
         end
     },
     {
@@ -161,9 +192,6 @@ require("lazy").setup({
 			"hrsh7th/cmp-nvim-lsp",
 		},
 		config = function()
-			-- import lspconfig plugin
-			local lspconfig = require("lspconfig")
-
 			-- import mason_lspconfig plugin
 			local mason_lspconfig = require("mason-lspconfig")
 
@@ -218,7 +246,7 @@ require("lazy").setup({
                 capabilities = capabilities,
                 on_attach = on_attach,
 			})
-            lspconfig.clangd.setup({
+            vim.lsp.config('clangd', {
                 cmd = { "clangd", "--header-insertion=never" },
                 filetypes = { 'cpp', 'h', 'c', 'hpp' },
                 capabilities = capabilities,
@@ -446,8 +474,26 @@ require("lazy").setup({
     },
     {
         "ThePrimeagen/refactoring.nvim",
+        dependencies = {
+            "nvim-lua/plenary.nvim",
+            "nvim-treesitter/nvim-treesitter",
+        },
         config = function()
-            require('refactoring').setup({})
+            require('refactoring').setup({
+                keys = {
+                    {
+                        "<leader>r",
+                        function()
+                            require("refactoring").select_refactor()
+                        end,
+                        mode = "v",
+                        noremap = true,
+                        silent = true,
+                        expr = false,
+                    },
+                },
+            })
+
         end
     },
     {
@@ -468,16 +514,16 @@ require("lazy").setup({
         dependencies = { 'nvim-tree/nvim-web-devicons'},
         config = function()
             local colors = {
-                bg       = '#282a36',
-                fg       = '#f8f8f2',
-                yellow   = '#f1fa8c',
-                cyan     = '#8be9fd',
-                darkblue = '#6272a4',
-                green    = '#50fa7b',
-                orange   = '#ffb86c',
-                violet   = '#bd93f9',
-                blue     = '#8be9fd',
-                red      = '#ff5555',
+                bg       = '#1B1D26',
+                fg       = '#D7D7D7',
+                yellow   = '#E3CF65',
+                cyan     = '#8DBBD3',
+                darkblue = '#14161D',
+                green    = '#76C5A4',
+                orange   = '#E39A65',
+                violet   = '#BDA9D4',
+                blue     = '#8DBBD3',
+                red      = '#D95555',
             }
             local conditions = {
                 buffer_not_empty = function()
@@ -600,6 +646,100 @@ require("lazy").setup({
                 color = { fg = colors.violet, gui = 'bold' },
             }
             require("lualine").setup(config)
+        end
+    },
+    {
+        "folke/trouble.nvim",
+        lazy = true,
+        cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
+        opts = {
+            modes = {
+                lsp = {
+                    win = { position = "right" },
+                },
+            },
+        },
+        keys = {
+            { "<leader>q", "<cmd>Trouble diagnostics toggle<cr>", desc = "Diagnostics (Trouble)" },
+            {
+                "[q",
+                function()
+                    if require("trouble").is_open() then
+                        require("trouble").prev({ skip_groups = true, jump = true })
+                    else
+                        local ok, err = pcall(vim.cmd.cprev)
+                        if not ok then
+                            vim.notify(err, vim.log.levels.ERROR)
+                        end
+                    end
+                end,
+                desc = "Previous Trouble/Quickfix Item",
+            },
+            {
+                "]q",
+                function()
+                    if require("trouble").is_open() then
+                        require("trouble").next({ skip_groups = true, jump = true })
+                    else
+                        local ok, err = pcall(vim.cmd.cnext)
+                        if not ok then
+                            vim.notify(err, vim.log.levels.ERROR)
+                        end
+                    end
+                end,
+                desc = "Next Trouble/Quickfix Item",
+            },
+        },
+    },
+    {
+        "folke/zen-mode.nvim",
+        cmd = { "ZenMode" },
+        opts = {},
+        keys = {
+            { "<leader>zz", "<cmd>ZenMode<cr>", desc = "Toggle zen mode" },
+        },
+    },
+    {
+        "nvim-tree/nvim-tree.lua",
+        lazy = true,
+        keys = {
+            { "<leader><tab>", "<cmd>NvimTreeToggle<cr>", desc = "Toggle NvimTree" },
+        },
+        config = function ()
+            require("nvim-tree").setup({
+                auto_reload_on_write = true,
+                disable_netrw = false,
+                hijack_cursor = true,
+                hijack_netrw = false,
+                hijack_unnamed_buffer_when_opening = true,
+                respect_buf_cwd = true,
+                prefer_startup_root = false,
+                sync_root_with_cwd = true,
+                renderer = {
+                    full_name = false,
+                    group_empty = true,
+                    add_trailing = false,
+                    symlink_destination = true,
+                    highlight_git = "all",
+                    root_folder_label = ":.:s?.*?/..?",
+                    special_files = { "Cargo.toml", "Makefile", "README.md", "readme.md", "CMakeLists.txt" },
+                    indent_markers = {
+                        enable = true,
+                        inline_arrows = true,
+                    },
+                    icons = {
+                        show = {
+                            file = true,
+                            folder = true,
+                            folder_arrow = true,
+                            git = true,
+                        },
+                        padding = " ",
+                        symlink_arrow = " 󰁔 ",
+                        git_placement = "after",
+                    }
+                }
+            })
         end
     },
 })
