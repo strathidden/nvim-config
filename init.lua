@@ -95,12 +95,15 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
-        "sainnhe/sonokai",
+        "Mofiqul/dracula.nvim",
         config = function()
-            vim.g.sonokai_enable_italic = 1
-            vim.g.sonokai_style = 'shusia'
-            vim.g.sonokai_better_performance = 1
-            vim.cmd.colorscheme("sonokai")
+            vim.cmd.colorscheme("dracula")
+   --          vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+			-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+			-- vim.api.nvim_set_hl(0, "Normal", { bg = "none" })
+			-- vim.api.nvim_set_hl(0, "NormalFloat", { bg = "none" })
+			-- vim.api.nvim_set_hl(0, "NormalNC", { bg = "none" })
+   --          vim.api.nvim_set_hl(0, "FloatBorder", { bg = "none" })
         end
     },
     {
@@ -445,6 +448,158 @@ require("lazy").setup({
         "ThePrimeagen/refactoring.nvim",
         config = function()
             require('refactoring').setup({})
+        end
+    },
+    {
+        "rmagatti/auto-session",
+        lazy = false,
+
+        ---@module "auto-session"
+        ---@type AutoSession.Config
+        opts = {
+            suppressed_dirs = { "~/", "~/dev", "~/Downloads", "/" },
+        },
+        config = function()
+            require("auto-session").setup({})
+        end
+    },
+    {
+        'nvim-lualine/lualine.nvim',
+        dependencies = { 'nvim-tree/nvim-web-devicons'},
+        config = function()
+            local colors = {
+                bg       = '#282a36',
+                fg       = '#f8f8f2',
+                yellow   = '#f1fa8c',
+                cyan     = '#8be9fd',
+                darkblue = '#6272a4',
+                green    = '#50fa7b',
+                orange   = '#ffb86c',
+                violet   = '#bd93f9',
+                blue     = '#8be9fd',
+                red      = '#ff5555',
+            }
+            local conditions = {
+                buffer_not_empty = function()
+                    return vim.fn.empty(vim.fn.expand('%:t')) ~= 1
+                end,
+                hide_in_width = function()
+                    return vim.fn.winwidth(0) > 80
+                end,
+                check_git_workspace = function()
+                    local filepath = vim.fn.expand('%:p:h')
+                    local gitdir = vim.fn.finddir('.git', filepath .. ';')
+                    return gitdir and #gitdir > 0 and #gitdir < #filepath
+                end,
+            }
+            local config = {
+                options = {
+                    globalstatus = true,
+                    component_separators = '',
+                    section_separators = '',
+                    theme = {
+                        normal = { c = { fg = colors.fg, bg = colors.bg } },
+                        inactive = { c = { fg = colors.fg, bg = colors.bg } },
+                    },
+                },
+                sections = {
+                    lualine_a = {},
+                    lualine_b = {},
+                    lualine_y = {},
+                    lualine_z = {},
+                    lualine_c = {},
+                    lualine_x = {},
+                },
+                inactive_sections = {
+                    lualine_a = {},
+                    lualine_b = {},
+                    lualine_y = {},
+                    lualine_z = {},
+                    lualine_c = {},
+                    lualine_x = {},
+                    lualine_h = {},
+                },
+            }
+            local function ins_left(component)
+                table.insert(config.sections.lualine_c, component)
+            end
+            local function ins_right(component)
+                table.insert(config.sections.lualine_x, component)
+            end
+            ins_left {
+                'filename',
+                path = 1,
+                cond = conditions.buffer_not_empty,
+                color = { fg = colors.violet, gui = 'bold' },
+            }
+            ins_left {
+                'location',
+                padding = { left = 0, right = 0 },
+                color = { fg = colors.blue, gui = 'bold' },
+            }
+            ins_left {
+                'branch',
+                icon = "",
+                color = { fg = colors.violet, gui = 'bold' },
+                padding = { left = 0, right = 0 },
+            }
+            ins_left {
+                'diff',
+                symbols = { added = 'a', modified = 'm', removed = 'r' },
+                diff_color = {
+                    added = { fg = colors.green },
+                    modified = { fg = colors.orange },
+                    removed = { fg = colors.red },
+                },
+            }
+            ins_left {
+                'diagnostics',
+                sources = { 'nvim_diagnostic' },
+                symbols = { error = 'e', warn = 'w', info = 'i', hint = 'h' },
+                diagnostics_color = {
+                    color_error = { fg = colors.red },
+                    color_warn = { fg = colors.yellow },
+                    color_info = { fg = colors.cyan },
+                    color_hint = { fg = colors.cyan },
+                },
+            }
+            ins_left {
+                function()
+                    local msg = 'NoLsp'
+                    local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
+                    local clients = vim.lsp.get_clients()
+                    if next(clients) == nil then
+                        return msg
+                    end
+                    for _, client in ipairs(clients) do
+                        local filetypes = client.config.filetypes
+                        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
+                            return client.name
+                        end
+                    end
+                    return msg
+                end,
+                color = { fg = colors.violet, gui = 'bold' },
+                cond = conditions.hide_in_width,
+            }
+            ins_left {
+                'o:encoding',
+                fmt = string.upper,
+                color = { fg = colors.green, gui = 'bold' },
+                cond = conditions.hide_in_width,
+            }
+            ins_left {
+                'fileformat',
+                fmt = string.upper,
+                icons_enabled = false,
+                color = { fg = colors.green, gui = 'bold' },
+                cond = conditions.hide_in_width,
+            }
+            ins_right {
+                'datetime',
+                color = { fg = colors.violet, gui = 'bold' },
+            }
+            require("lualine").setup(config)
         end
     },
 })
