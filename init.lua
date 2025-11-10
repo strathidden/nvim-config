@@ -132,9 +132,11 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
-        "Yazeed1s/oh-lucy.nvim",
+        "huyvohcmc/atlas.vim",
+        lazy = false,
+        priority = 1000,
         config = function()
-            vim.cmd.colorscheme("oh-lucy")
+            vim.cmd.colorscheme("atlas")
         end
     },
     {
@@ -497,158 +499,6 @@ require("lazy").setup({
         end
     },
     {
-        "rmagatti/auto-session",
-        lazy = false,
-
-        ---@module "auto-session"
-        ---@type AutoSession.Config
-        opts = {
-            suppressed_dirs = { "~/", "~/dev", "~/Downloads", "/" },
-        },
-        config = function()
-            require("auto-session").setup({})
-        end
-    },
-    {
-        'nvim-lualine/lualine.nvim',
-        dependencies = { 'nvim-tree/nvim-web-devicons'},
-        config = function()
-            local colors = {
-                bg       = '#1B1D26',
-                fg       = '#D7D7D7',
-                yellow   = '#E3CF65',
-                cyan     = '#8DBBD3',
-                darkblue = '#14161D',
-                green    = '#76C5A4',
-                orange   = '#E39A65',
-                violet   = '#BDA9D4',
-                blue     = '#8DBBD3',
-                red      = '#D95555',
-            }
-            local conditions = {
-                buffer_not_empty = function()
-                    return vim.fn.empty(vim.fn.expand('%:t')) ~= 1
-                end,
-                hide_in_width = function()
-                    return vim.fn.winwidth(0) > 80
-                end,
-                check_git_workspace = function()
-                    local filepath = vim.fn.expand('%:p:h')
-                    local gitdir = vim.fn.finddir('.git', filepath .. ';')
-                    return gitdir and #gitdir > 0 and #gitdir < #filepath
-                end,
-            }
-            local config = {
-                options = {
-                    globalstatus = true,
-                    component_separators = '',
-                    section_separators = '',
-                    theme = {
-                        normal = { c = { fg = colors.fg, bg = colors.bg } },
-                        inactive = { c = { fg = colors.fg, bg = colors.bg } },
-                    },
-                },
-                sections = {
-                    lualine_a = {},
-                    lualine_b = {},
-                    lualine_y = {},
-                    lualine_z = {},
-                    lualine_c = {},
-                    lualine_x = {},
-                },
-                inactive_sections = {
-                    lualine_a = {},
-                    lualine_b = {},
-                    lualine_y = {},
-                    lualine_z = {},
-                    lualine_c = {},
-                    lualine_x = {},
-                    lualine_h = {},
-                },
-            }
-            local function ins_left(component)
-                table.insert(config.sections.lualine_c, component)
-            end
-            local function ins_right(component)
-                table.insert(config.sections.lualine_x, component)
-            end
-            ins_left {
-                'filename',
-                path = 1,
-                cond = conditions.buffer_not_empty,
-                color = { fg = colors.violet, gui = 'bold' },
-            }
-            ins_left {
-                'location',
-                padding = { left = 0, right = 0 },
-                color = { fg = colors.blue, gui = 'bold' },
-            }
-            ins_left {
-                'branch',
-                icon = "",
-                color = { fg = colors.violet, gui = 'bold' },
-                padding = { left = 0, right = 0 },
-            }
-            ins_left {
-                'diff',
-                symbols = { added = 'a', modified = 'm', removed = 'r' },
-                diff_color = {
-                    added = { fg = colors.green },
-                    modified = { fg = colors.orange },
-                    removed = { fg = colors.red },
-                },
-            }
-            ins_left {
-                'diagnostics',
-                sources = { 'nvim_diagnostic' },
-                symbols = { error = 'e', warn = 'w', info = 'i', hint = 'h' },
-                diagnostics_color = {
-                    color_error = { fg = colors.red },
-                    color_warn = { fg = colors.yellow },
-                    color_info = { fg = colors.cyan },
-                    color_hint = { fg = colors.cyan },
-                },
-            }
-            ins_left {
-                function()
-                    local msg = 'NoLsp'
-                    local buf_ft = vim.api.nvim_buf_get_option(0, 'filetype')
-                    local clients = vim.lsp.get_clients()
-                    if next(clients) == nil then
-                        return msg
-                    end
-                    for _, client in ipairs(clients) do
-                        local filetypes = client.config.filetypes
-                        if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
-                            return client.name
-                        end
-                    end
-                    return msg
-                end,
-                color = { fg = colors.violet, gui = 'bold' },
-                cond = conditions.hide_in_width,
-            }
-            ins_left {
-                'o:encoding',
-                fmt = string.upper,
-                color = { fg = colors.green, gui = 'bold' },
-                cond = conditions.hide_in_width,
-            }
-            ins_left {
-                'fileformat',
-                fmt = string.upper,
-                icons_enabled = false,
-                color = { fg = colors.green, gui = 'bold' },
-                cond = conditions.hide_in_width,
-            }
-            ins_right {
-                'datetime',
-                color = { fg = colors.violet, gui = 'bold' },
-            }
-            require("lualine").setup(config)
-        end
-    },
-    {
         "folke/trouble.nvim",
         lazy = true,
         cmd = { "Trouble", "TroubleToggle", "TroubleRefresh" },
@@ -741,5 +591,17 @@ require("lazy").setup({
                 }
             })
         end
+    },
+    {
+        "folke/flash.nvim",
+        event = "VeryLazy",
+        ---@type Flash.Config
+        opts = {},
+        keys = {
+            { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+        },
+    },
+    {
+        "j-hui/fidget.nvim",
     },
 })
