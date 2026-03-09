@@ -1,5 +1,5 @@
 vim.opt.number = true
-vim.opt.relativenumber = true
+vim.opt.relativenumber = false
 
 vim.opt.splitbelow = true
 vim.opt.splitright = true
@@ -132,11 +132,11 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
-        "huyvohcmc/atlas.vim",
+        "savq/melange-nvim",
         lazy = false,
         priority = 1000,
         config = function()
-            vim.cmd.colorscheme("atlas")
+            vim.cmd.colorscheme("melange")
         end
     },
     {
@@ -248,7 +248,7 @@ require("lazy").setup({
                 capabilities = capabilities,
                 on_attach = on_attach,
 			})
-            vim.lsp.config('clangd', {
+            vim.lsp.enable('clangd', {
                 cmd = { "clangd", "--header-insertion=never" },
                 filetypes = { 'cpp', 'h', 'c', 'hpp' },
                 capabilities = capabilities,
@@ -600,8 +600,5 @@ require("lazy").setup({
         keys = {
             { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
         },
-    },
-    {
-        "j-hui/fidget.nvim",
     },
 })
