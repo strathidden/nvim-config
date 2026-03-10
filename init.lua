@@ -52,6 +52,14 @@ vim.opt.ttimeoutlen = 0
 
 vim.g.mapleader = " "
 
+if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
+    vim.opt.shell = vim.fn.executable "pwsh" and "pwsh -NoLogo" or "powershell"
+    vim.opt.shellcmdflag = "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;"
+    vim.opt.shellredir = "-RedirectStandardOutput %s -NoNewWindow -Wait"
+    vim.opt.shellpipe = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
+    vim.opt.shellquote = ""
+    vim.opt.shellxquote = ""
+end
 
 -- glsl lsp fix
 vim.filetype.add({
@@ -94,6 +102,17 @@ vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gc<Left><Left><
 vim.keymap.set("n", "<leader>rc", function()
     vim.cmd("edit " .. vim.fn.stdpath("config") .. "/init.lua")
 end, { desc = "Edit Neovim config" })
+
+vim.keymap.set("n", "<C-w>t", "<cmd>vsplit | term<CR>", { desc = "Open Terminal" })
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal" })
+
+vim.api.nvim_create_autocmd('TermOpen', {
+    group = vim.api.nvim_create_augroup('term-open', { clear = true }),
+    callback = function ()
+        vim.opt.number = false
+        vim.opt.relativenumber = false
+    end,
+})
 
 -- don't auto comment new line
 vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=cro]] })
@@ -269,11 +288,24 @@ require("lazy").setup({
 			-- used to enable autocompletion (assign to every lsp server config)
 			local capabilities = cmp_nvim_lsp.default_capabilities()
 
-			local signs = { Error = " ", Warn = " ", Hint = "󰠠 ", Info = " " }
-			for type, icon in pairs(signs) do
-				local hl = "DiagnosticSign" .. type
-				vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
-			end
+            vim.diagnostic.config({
+                virtual_text = true,
+                underline = true,
+                update_in_insert = false,
+                severity_sort = true,
+                signs = {
+                    text = {
+                        [vim.diagnostic.severity.ERROR] = "󰅚 ",
+                        [vim.diagnostic.severity.WARN] = "󰀪 ",
+                        [vim.diagnostic.severity.INFO] = "󰋽 ",
+                        [vim.diagnostic.severity.HINT] = "󰌶 ",
+                    },
+                    numhl = {
+                        [vim.diagnostic.severity.ERROR] = "ErrorMsg",
+                        [vim.diagnostic.severity.WARN] = "WarningMsg",
+                    },
+                },
+            })
 
 			mason_lspconfig.setup({
                 automatic_enable = {
@@ -285,7 +317,7 @@ require("lazy").setup({
                 on_attach = on_attach,
 			})
             vim.lsp.config('clangd', {
-                cmd = { "clangd", "--background-index", "--clang-tidy", "--completion-style=detailed", "--cross-file-rename", "--header-insertion=never" },
+                cmd = { "clangd", "--background-index", "--clang-tidy", "--completion-style=detailed", "--cross-file-rename", "--header-insertion=never", "--pretty" },
                 init_options = {
                     fallbackFlags = { '--std=c++20' },
                 },
