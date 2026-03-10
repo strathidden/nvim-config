@@ -15,10 +15,21 @@ vim.opt.swapfile = false
 vim.opt.backup = false
 vim.opt.undofile = true
 
+local undodir = vim.fn.expand("~/.vim/undodir")
+if
+    vim.fn.isdirectory(undodir) == 0
+then
+    vim.fn.mkdir(undodir, "p")
+end
+
+vim.opt.undodir = undodir
+
 vim.opt.hlsearch = false
 vim.opt.incsearch = true
 
 vim.opt.signcolumn = "no"
+
+vim.opt.colorcolumn = "110" 
 
 vim.opt.updatetime = 50
 
@@ -35,7 +46,12 @@ vim.opt.smartcase = true
 
 vim.opt.termguicolors = true
 
+vim.opt.updatetime = 300
+vim.opt.timeoutlen = 500
+vim.opt.ttimeoutlen = 0
+
 vim.g.mapleader = " "
+
 
 -- glsl lsp fix
 vim.filetype.add({
@@ -66,6 +82,7 @@ vim.keymap.set("n", "<C-h>", "<C-w>h", { desc = "Move to left split" })
 vim.keymap.set("n", "<C-j>", "<C-w>j", { desc = "Move to below split" })
 vim.keymap.set("n", "<C-k>", "<C-w>k", { desc = "Move to above split" })
 vim.keymap.set("n", "<C-l>", "<C-w>l", { desc = "Move to right split" })
+vim.keymap.set("n", "<C-c>", "<C-w>c", { desc = "Close split"})
 
 vim.keymap.set("v", "<", "<gv", { desc = "(V) Indent to left" })
 vim.keymap.set("v", ">", ">gv", { desc = "(V) Indent to right" })
@@ -73,6 +90,10 @@ vim.keymap.set("v", ">", ">gv", { desc = "(V) Indent to right" })
 vim.keymap.set("x", "<leader>p", "\"_dP")
 
 vim.keymap.set("n", "<leader>s", [[:%s/\<<C-r><C-w>\>/<C-r><C-w>/gc<Left><Left><Left>]])
+
+vim.keymap.set("n", "<leader>rc", function()
+    vim.cmd("edit " .. vim.fn.stdpath("config") .. "/init.lua")
+end, { desc = "Edit Neovim config" })
 
 -- don't auto comment new line
 vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=cro]] })
@@ -113,6 +134,18 @@ vim.api.nvim_create_autocmd("FileType", { pattern = "man", command = [[nnoremap 
 
 -- resize neovim split when terminal is resized
 vim.api.nvim_command("autocmd VimResized * wincmd =")
+
+local hightlight_yank_group = vim.api.nvim_create_augroup("HighlightYank", {})
+vim.api.nvim_create_autocmd("TextYankPost", {
+    group = hightlight_yank_group,
+    pattern = "*",
+    callback = function ()
+        vim.hl.on_yank({
+            higroup = "IncSearch",
+            timeout = 200,
+        })
+    end
+})
 
 local lazypath = vim.fn.stdpath("data") .. "/lazy/lazy.nvim"
 if not (vim.uv or vim.loop).fs_stat(lazypath) then
@@ -214,6 +247,9 @@ require("lazy").setup({
 				opts.desc = "Show LSP definitions"
 				vim.keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- show lsp definitions
 
+                opts.desc = "Show LSP definitions in split"
+                vim.keymap.set("n", "gs", "<cmd>vsplit | Telescope lsp_definitions<CR>", opts) -- show lsp definitions in split
+
 				opts.desc = "Show LSP implementations"
 				vim.keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
 
@@ -248,12 +284,15 @@ require("lazy").setup({
                 capabilities = capabilities,
                 on_attach = on_attach,
 			})
-            vim.lsp.enable('clangd', {
-                cmd = { "clangd", "--header-insertion=never" },
-                filetypes = { 'cpp', 'h', 'c', 'hpp' },
+            vim.lsp.config('clangd', {
+                cmd = { "clangd", "--background-index", "--clang-tidy", "--completion-style=detailed", "--cross-file-rename", "--header-insertion=never" },
+                init_options = {
+                    fallbackFlags = { '--std=c++20' },
+                },
                 capabilities = capabilities,
                 on_attach = on_attach,
             })
+            vim.lsp.enable({'clangd'})
 		end,
 	},
 	{
@@ -405,8 +444,8 @@ require("lazy").setup({
 
 			telescope.load_extension("fzf")
 
-			vim.keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>")
-			vim.keymap.set("n", "<leader>g", "<cmd>Telescope live_grep<cr>")
+			vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>")
+			vim.keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<cr>")
 		end,
 	},
 	{
@@ -469,33 +508,13 @@ require("lazy").setup({
         "tpope/vim-fugitive",
     },
     {
-        "laytan/cloak.nvim",
-        config = function()
-            require("cloak").setup({})
-        end
-    },
-    {
         "ThePrimeagen/refactoring.nvim",
         dependencies = {
             "nvim-lua/plenary.nvim",
             "nvim-treesitter/nvim-treesitter",
         },
         config = function()
-            require('refactoring').setup({
-                keys = {
-                    {
-                        "<leader>r",
-                        function()
-                            require("refactoring").select_refactor()
-                        end,
-                        mode = "v",
-                        noremap = true,
-                        silent = true,
-                        expr = false,
-                    },
-                },
-            })
-
+            require('refactoring').setup({})
         end
     },
     {
@@ -593,12 +612,17 @@ require("lazy").setup({
         end
     },
     {
-        "folke/flash.nvim",
+        "folke/which-key.nvim",
         event = "VeryLazy",
-        ---@type Flash.Config
         opts = {},
         keys = {
-            { "s", mode = { "n", "x", "o" }, function() require("flash").jump() end, desc = "Flash" },
+            {
+                "<leader>?",
+                function ()
+                    require("which-key").show({ global = false })
+                end,
+                desc = "Buffer Local Keymaps (which-key)",
+            },
         },
-    },
+    }
 })
