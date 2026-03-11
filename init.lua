@@ -106,6 +106,10 @@ end, { desc = "Edit Neovim config" })
 vim.keymap.set("n", "<C-w>t", "<cmd>vsplit | term<CR>", { desc = "Open Terminal" })
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal" })
 
+vim.keymap.set("n", "<leader>x", function()
+  vim.lsp.buf.format({ async = true })
+end, { desc = "Format file with LSP" })
+
 vim.api.nvim_create_autocmd('TermOpen', {
     group = vim.api.nvim_create_augroup('term-open', { clear = true }),
     callback = function ()
