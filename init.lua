@@ -29,7 +29,7 @@ vim.opt.incsearch = true
 
 vim.opt.signcolumn = "no"
 
-vim.opt.colorcolumn = "110" 
+vim.opt.colorcolumn = "110"
 
 vim.opt.updatetime = 50
 
@@ -601,7 +601,7 @@ require("lazy").setup({
         cmd = { "ZenMode" },
         opts = {},
         keys = {
-            { "<leader>zz", "<cmd>ZenMode<cr>", desc = "Toggle zen mode" },
+            { "<leader>z", "<cmd>ZenMode<cr>", desc = "Toggle zen mode" },
         },
     },
     {
@@ -660,5 +660,15 @@ require("lazy").setup({
                 desc = "Buffer Local Keymaps (which-key)",
             },
         },
+    },
+    {
+        "kovisoft/slimv",
+        config = function ()
+            if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
+                local data_path = vim.fn.stdpath("data")
+                local swank_path = data_path .. "/lazy/slimv/slime/start-swank.lisp"
+                vim.fn.jobstart({ "sbcl", "--load", swank_path }, { detach = false })
+            end
+        end
     }
 })
