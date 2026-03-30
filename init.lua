@@ -663,17 +663,6 @@ require("lazy").setup({
         },
     },
     {
-        "kovisoft/slimv",
-        config = function()
-            vim.g.slimv_repl_split = 4
-            if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
-                local data_path = vim.fn.stdpath("data")
-                local swank_path = data_path .. "/lazy/slimv/slime/start-swank.lisp"
-                vim.fn.jobstart({ "sbcl", "--load", swank_path }, { detach = false })
-            end
-        end
-    },
-    {
         "nvim-mini/mini.statusline",
         version = false,
         config = function()
