@@ -675,19 +675,5 @@ require("lazy").setup({
         config = function()
             require("mini.surround").setup()
         end
-    },
-    {
-        "nvim-orgmode/orgmode",
-        event = "VeryLazy",
-        ft = { "org" },
-        config = function()
-            require("orgmode").setup({
-                org_agenda_files = "~/orgfiles/**/*",
-                org_default_notes_file = "~/orgfiles/refile.org",
-            })
-            vim.keymap.set("n", "<leader>of", function()
-                require("telescope.builtin").find_files({ cwd = vim.fn.expand("~/orgfiles") })
-            end, { desc = "org find_files" })
-        end,
     }
 })
