@@ -52,6 +52,7 @@ vim.opt.ttimeoutlen = 0
 
 vim.g.mapleader = " "
 
+-- fix pwsh for terminal buffer
 if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
     vim.opt.shell = vim.fn.executable "pwsh" and "pwsh -NoLogo" or "powershell"
     vim.opt.shellcmdflag =
@@ -62,7 +63,7 @@ if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
     vim.opt.shellxquote = ""
 end
 
--- glsl lsp fix
+-- fix glsl lsp
 vim.filetype.add({
     extension = {
         vert = "glsl",
@@ -71,12 +72,9 @@ vim.filetype.add({
     },
 })
 
--- line wrap fix
+-- fix line wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
-
--- vim.keymap.set('n', '<leader>q', vim.diagnostic.setqflist)
--- vim.keymap.set('n', '<leader>qn', vim.diagnostic.goto_next)
 
 vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
@@ -159,6 +157,7 @@ vim.api.nvim_create_autocmd("FileType", { pattern = "man", command = [[nnoremap 
 -- resize neovim split when terminal is resized
 vim.api.nvim_command("autocmd VimResized * wincmd =")
 
+-- hightlight text on yank
 local hightlight_yank_group = vim.api.nvim_create_augroup("HighlightYank", {})
 vim.api.nvim_create_autocmd("TextYankPost", {
     group = hightlight_yank_group,
@@ -234,9 +233,9 @@ require("lazy").setup({
                             ["as"] = { query = "@scope", query_group = "locals", desc = "Select language scope" },
                         },
                         selection_modes = {
-                            ["@parameter.outer"] = "v", -- charwise
-                            ["@function.outer"] = "V", -- linewise
-                            ["@class.outer"] = "<c-v>", -- blockwise
+                            ["@parameter.outer"] = "v",
+                            ["@function.outer"] = "V",
+                            ["@class.outer"] = "<c-v>",
                         },
                         include_surrounding_whitespace = true,
                     },
@@ -258,36 +257,35 @@ require("lazy").setup({
             local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
             local opts = { noremap = true, silent = true }
-            local on_attach = function(client, bufnr)
+            local on_attach = function(bufnr)
                 opts.buffer = bufnr
 
-                -- set keybinds
                 opts.desc = "Show LSP references"
-                vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts) -- show definition, references
+                vim.keymap.set("n", "gr", "<cmd>Telescope lsp_references<CR>", opts)
 
                 opts.desc = "Go to declaration"
-                vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts) -- go to declaration
+                vim.keymap.set("n", "gD", vim.lsp.buf.declaration, opts)
 
                 opts.desc = "Show LSP definitions"
-                vim.keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts) -- show lsp definitions
+                vim.keymap.set("n", "gd", "<cmd>Telescope lsp_definitions<CR>", opts)
 
                 opts.desc = "Show LSP definitions in split"
-                vim.keymap.set("n", "gs", "<cmd>vsplit | Telescope lsp_definitions<CR>", opts) -- show lsp definitions in split
+                vim.keymap.set("n", "gs", "<cmd>vsplit | Telescope lsp_definitions<CR>", opts)
 
                 opts.desc = "Show LSP implementations"
-                vim.keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts) -- show lsp implementations
+                vim.keymap.set("n", "gi", "<cmd>Telescope lsp_implementations<CR>", opts)
 
                 opts.desc = "Show LSP type definitions"
-                vim.keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts) -- show lsp type definitions
+                vim.keymap.set("n", "gt", "<cmd>Telescope lsp_type_definitions<CR>", opts)
 
                 opts.desc = "See available code actions"
-                vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts) -- see available code actions, in visual mode will apply to selection
+                vim.keymap.set({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, opts)
 
                 opts.desc = "Smart rename"
-                vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts) -- smart rename
+                vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
 
                 opts.desc = "Show documentation for what is under cursor"
-                vim.keymap.set("n", "K", vim.lsp.buf.hover, opts) -- show documentation for what is under cursor
+                vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
             end
 
             -- used to enable autocompletion (assign to every lsp server config)
@@ -321,6 +319,8 @@ require("lazy").setup({
                 capabilities = capabilities,
                 on_attach = on_attach,
             })
+
+            -- custom clangd stuff
             vim.lsp.config('clangd', {
                 cmd = { "clangd", "--background-index", "--clang-tidy", "--completion-style=detailed", "--cross-file-rename", "--header-insertion=never", "--pretty" },
                 init_options = {
@@ -329,6 +329,7 @@ require("lazy").setup({
                 capabilities = capabilities,
                 on_attach = on_attach,
             })
+
             vim.lsp.enable({ 'clangd' })
         end,
     },
@@ -338,10 +339,8 @@ require("lazy").setup({
             "williamboman/mason-lspconfig.nvim",
         },
         config = function()
-            -- import mason
             local mason = require("mason")
 
-            -- enable mason and configure icons
             mason.setup({
                 ui = {
                     icons = {
@@ -371,12 +370,9 @@ require("lazy").setup({
                     completeopt = "menu,menuone,noinsert,preview",
                 },
                 mapping = cmp.mapping.preset.insert({
-                    --["<S-Tab>"] = cmp.mapping.select_prev_item(), -- previous suggestion
-                    --["<Tab>"] = cmp.mapping.select_next_item(), -- next suggestion
                     ["<C-d>"] = cmp.mapping.scroll_docs(-4),
                     ["<C-f>"] = cmp.mapping.scroll_docs(4),
-                    ["<C-Space>"] = cmp.mapping.complete(), -- show completion suggestions
-                    --["<CR>"] = cmp.mapping.confirm({ select = true }),
+                    ["<C-Space>"] = cmp.mapping.complete(),
                     ["<CR>"] = cmp.mapping(function(fallback)
                         if cmp.visible() then
                             cmp.confirm({
@@ -405,8 +401,8 @@ require("lazy").setup({
                 }),
                 sources = cmp.config.sources({
                     { name = "nvim_lsp" },
-                    { name = "buffer" }, -- text within current buffer
-                    { name = "path" }, -- file system paths
+                    { name = "buffer" },
+                    { name = "path" },
                 }),
                 formatting = {
                     format = lspkind.cmp_format({
@@ -424,26 +420,21 @@ require("lazy").setup({
             "hrsh7th/nvim-cmp",
         },
         config = function()
-            -- import nvim-autopairs
             local autopairs = require("nvim-autopairs")
 
-            -- configure autopairs
             autopairs.setup({
-                check_ts = true,         -- enable treesitter
+                check_ts = true,
                 ts_config = {
-                    lua = { "string" },  -- don't add pairs in lua string treesitter nodes
-                    javascript = { "template_string" }, -- don't add pairs in javscript template_string treesitter nodes
-                    java = false,        -- don't check treesitter on java
+                    lua = { "string" },
+                    javascript = { "template_string" },
+                    java = false,
                 },
             })
 
-            -- import nvim-autopairs completion functionality
             local cmp_autopairs = require("nvim-autopairs.completion.cmp")
 
-            -- import nvim-cmp plugin (completions plugin)
             local cmp = require("cmp")
 
-            -- make autopairs and completion work together
             cmp.event:on("confirm_done", cmp_autopairs.on_confirm_done())
         end,
     },
@@ -463,8 +454,8 @@ require("lazy").setup({
                     path_display = { "smart" },
                     mappings = {
                         i = {
-                            ["<C-k>"] = actions.move_selection_previous, -- move to prev result
-                            ["<C-j>"] = actions.move_selection_next, -- move to next result
+                            ["<C-k>"] = actions.move_selection_previous,
+                            ["<C-j>"] = actions.move_selection_next,
                         },
                         n = { ['q'] = actions.close },
                     },
