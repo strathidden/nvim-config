@@ -52,17 +52,6 @@ vim.opt.ttimeoutlen = 0
 
 vim.g.mapleader = " "
 
--- fix pwsh for terminal buffer
-if vim.fn.has("win32") == 1 or vim.fn.has("win64") == 1 then
-    vim.opt.shell = vim.fn.executable "pwsh" and "pwsh -NoLogo" or "powershell"
-    vim.opt.shellcmdflag =
-    "-NoLogo -NoProfile -ExecutionPolicy RemoteSigned -Command [Console]::InputEncoding=[Console]::OutputEncoding=[System.Text.Encoding]::UTF8;"
-    vim.opt.shellredir = "-RedirectStandardOutput %s -NoNewWindow -Wait"
-    vim.opt.shellpipe = "2>&1 | Out-File -Encoding UTF8 %s; exit $LastExitCode"
-    vim.opt.shellquote = ""
-    vim.opt.shellxquote = ""
-end
-
 -- fix glsl lsp
 vim.filetype.add({
     extension = {
@@ -102,42 +91,12 @@ vim.keymap.set("n", "<leader>rc", function()
     vim.cmd("edit " .. vim.fn.stdpath("config") .. "/init.lua")
 end, { desc = "Edit Neovim config" })
 
-vim.keymap.set("n", "<C-w>t", "<cmd>vsplit | term<CR>", { desc = "Open Terminal" })
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal" })
-
 vim.keymap.set("n", "<leader>x", function()
     vim.lsp.buf.format({ async = true })
 end, { desc = "Format file with LSP" })
 
-vim.api.nvim_create_autocmd('TermOpen', {
-    group = vim.api.nvim_create_augroup('term-open', { clear = true }),
-    callback = function()
-        vim.opt.number = false
-        vim.opt.relativenumber = false
-    end,
-})
-
 -- don't auto comment new line
 vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=cro]] })
-
--- to make border as same as neovim ColorScheme
-vim.api.nvim_create_autocmd({ "UIEnter", "ColorScheme" }, {
-    callback = function()
-        local normal = vim.api.nvim_get_hl(0, { name = "Normal" })
-        if not normal.bg then
-            return
-        end
-        io.write(string.format("\027Ptmux;\027\027]11;#%06x\007\027\\", normal.bg))
-        io.write(string.format("\027]11;#%06x\027\\", normal.bg))
-    end,
-})
-
-vim.api.nvim_create_autocmd("UILeave", {
-    callback = function()
-        io.write("\027Ptmux;\027\027]111;\007\027\\")
-        io.write("\027]111\027\\")
-    end,
-})
 
 -- go to last location when opening a buffer
 vim.api.nvim_create_autocmd('BufReadPost', {
@@ -150,9 +109,6 @@ vim.api.nvim_create_autocmd('BufReadPost', {
         end
     end,
 })
-
--- auto close
-vim.api.nvim_create_autocmd("FileType", { pattern = "man", command = [[nnoremap <buffer><silent> q :quit<CR>]] })
 
 -- resize neovim split when terminal is resized
 vim.api.nvim_command("autocmd VimResized * wincmd =")
