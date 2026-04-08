@@ -491,36 +491,6 @@ require("lazy").setup({
         end,
     },
     {
-        "ThePrimeagen/harpoon",
-        branch = "harpoon2",
-        dependencies = { "nvim-lua/plenary.nvim" },
-        config = function()
-            local harpoon = require("harpoon")
-
-            harpoon:setup()
-
-            vim.keymap.set("n", "<leader>m", function()
-                harpoon:list():add()
-            end)
-            vim.keymap.set("n", "<leader>e", function()
-                harpoon.ui:toggle_quick_menu(harpoon:list())
-            end)
-
-            vim.keymap.set("n", "<leader>h", function()
-                harpoon:list():select(1)
-            end)
-            vim.keymap.set("n", "<leader>j", function()
-                harpoon:list():select(2)
-            end)
-            vim.keymap.set("n", "<leader>k", function()
-                harpoon:list():select(3)
-            end)
-            vim.keymap.set("n", "<leader>l", function()
-                harpoon:list():select(4)
-            end)
-        end,
-    },
-    {
         "numToStr/Comment.nvim",
         config = function()
             require("Comment").setup()
@@ -534,16 +504,6 @@ require("lazy").setup({
     },
     {
         "tpope/vim-fugitive",
-    },
-    {
-        "ThePrimeagen/refactoring.nvim",
-        dependencies = {
-            "nvim-lua/plenary.nvim",
-            "nvim-treesitter/nvim-treesitter",
-        },
-        config = function()
-            require('refactoring').setup({})
-        end
     },
     {
         "folke/trouble.nvim",
@@ -595,49 +555,6 @@ require("lazy").setup({
         keys = {
             { "<leader>z", "<cmd>ZenMode<cr>", desc = "Toggle zen mode" },
         },
-    },
-    {
-        "nvim-tree/nvim-tree.lua",
-        lazy = true,
-        keys = {
-            { "<leader><tab>", "<cmd>NvimTreeToggle<cr>", desc = "Toggle NvimTree" },
-        },
-        config = function()
-            require("nvim-tree").setup({
-                auto_reload_on_write = true,
-                disable_netrw = false,
-                hijack_cursor = true,
-                hijack_netrw = false,
-                hijack_unnamed_buffer_when_opening = true,
-                respect_buf_cwd = true,
-                prefer_startup_root = false,
-                sync_root_with_cwd = true,
-                renderer = {
-                    full_name = false,
-                    group_empty = true,
-                    add_trailing = false,
-                    symlink_destination = true,
-                    highlight_git = "all",
-                    root_folder_label = ":.:s?.*?/..?",
-                    special_files = { "Cargo.toml", "Makefile", "README.md", "readme.md", "CMakeLists.txt" },
-                    indent_markers = {
-                        enable = true,
-                        inline_arrows = true,
-                    },
-                    icons = {
-                        show = {
-                            file = true,
-                            folder = true,
-                            folder_arrow = true,
-                            git = true,
-                        },
-                        padding = " ",
-                        symlink_arrow = " 󰁔 ",
-                        git_placement = "after",
-                    }
-                }
-            })
-        end
     },
     {
         "folke/which-key.nvim",
