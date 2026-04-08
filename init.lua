@@ -46,10 +46,6 @@ vim.opt.smartcase = true
 
 vim.opt.termguicolors = true
 
-vim.opt.updatetime = 300
-vim.opt.timeoutlen = 500
-vim.opt.ttimeoutlen = 0
-
 vim.g.mapleader = " "
 
 -- fix glsl lsp
