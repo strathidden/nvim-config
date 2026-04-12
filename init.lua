@@ -48,7 +48,6 @@ vim.opt.termguicolors = true
 
 vim.g.mapleader = " "
 
--- fix glsl lsp
 vim.filetype.add({
     extension = {
         vert = "glsl",
@@ -57,7 +56,6 @@ vim.filetype.add({
     },
 })
 
--- fix line wrap
 vim.keymap.set('n', 'k', "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
 vim.keymap.set('n', 'j', "v:count == 0 ? 'gj' : 'j'", { expr = true, silent = true })
 
@@ -91,10 +89,8 @@ vim.keymap.set("n", "<leader>x", function()
     vim.lsp.buf.format({ async = true })
 end, { desc = "Format file with LSP" })
 
--- don't auto comment new line
 vim.api.nvim_create_autocmd("BufEnter", { command = [[set formatoptions-=cro]] })
 
--- go to last location when opening a buffer
 vim.api.nvim_create_autocmd('BufReadPost', {
     group = vim.api.nvim_create_augroup('last_loc', { clear = true }),
     callback = function()
@@ -106,10 +102,8 @@ vim.api.nvim_create_autocmd('BufReadPost', {
     end,
 })
 
--- resize neovim split when terminal is resized
 vim.api.nvim_command("autocmd VimResized * wincmd =")
 
--- hightlight text on yank
 local hightlight_yank_group = vim.api.nvim_create_augroup("HighlightYank", {})
 vim.api.nvim_create_autocmd("TextYankPost", {
     group = hightlight_yank_group,
@@ -202,14 +196,12 @@ require("lazy").setup({
             "hrsh7th/cmp-nvim-lsp",
         },
         config = function()
-            -- import mason_lspconfig plugin
             local mason_lspconfig = require("mason-lspconfig")
 
-            -- import cmp-nvim-lsp plugin
             local cmp_nvim_lsp = require("cmp_nvim_lsp")
 
             local opts = { noremap = true, silent = true }
-            local on_attach = function(bufnr)
+            local on_attach = function(client, bufnr)
                 opts.buffer = bufnr
 
                 opts.desc = "Show LSP references"
@@ -240,7 +232,6 @@ require("lazy").setup({
                 vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
             end
 
-            -- used to enable autocompletion (assign to every lsp server config)
             local capabilities = cmp_nvim_lsp.default_capabilities()
 
             vim.diagnostic.config({
@@ -263,21 +254,13 @@ require("lazy").setup({
             })
 
             mason_lspconfig.setup({
-                automatic_enable = {
-                    exclude = {
-                        "clangd",
-                    },
-                },
+                automatic_enable = {},
                 capabilities = capabilities,
                 on_attach = on_attach,
             })
 
-            -- custom clangd stuff
             vim.lsp.config('clangd', {
                 cmd = { "clangd", "--background-index", "--clang-tidy", "--completion-style=detailed", "--cross-file-rename", "--header-insertion=never", "--pretty" },
-                init_options = {
-                    fallbackFlags = { '--std=c++20' },
-                },
                 capabilities = capabilities,
                 on_attach = on_attach,
             })
