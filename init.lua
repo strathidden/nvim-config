@@ -134,11 +134,11 @@ vim.opt.rtp:prepend(lazypath)
 
 require("lazy").setup({
     {
-        "savq/melange-nvim",
+        "marekh19/meowsoot.nvim",
         lazy = false,
         priority = 1000,
         config = function()
-            vim.cmd.colorscheme("melange")
+            vim.cmd.colorscheme("meowsoot")
         end
     },
     {
@@ -266,6 +266,7 @@ require("lazy").setup({
             })
 
             vim.lsp.enable({ 'clangd' })
+            vim.lsp.enable({ 'gleam' })
         end,
     },
     {
@@ -412,7 +413,7 @@ require("lazy").setup({
         end,
     },
     {
-        "stevearc/oil.nvim",
+        "barrettruth/canola.nvim",
         dependencies = { "nvim-tree/nvim-web-devicons" },
         config = function()
             require("oil").setup({
