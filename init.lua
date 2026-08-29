@@ -407,17 +407,25 @@ require("lazy").setup({
 
             telescope.load_extension("fzf")
 
-            vim.keymap.set("n", "<leader>ff", "<cmd>Telescope find_files<cr>")
-            vim.keymap.set("n", "<leader>fg", "<cmd>Telescope live_grep<cr>")
+            vim.keymap.set("n", "<leader>f", "<cmd>Telescope find_files<cr>")
+            vim.keymap.set("n", "<leader>g", "<cmd>Telescope live_grep<cr>")
         end,
     },
     {
-        "barrettruth/canola.nvim",
-        dependencies = { "nvim-tree/nvim-web-devicons" },
+        "stevearc/oil.nvim",
+        dependencies = { { "nvim-mini/mini.icons", opts = {} } },
+        lazy = false,
         config = function()
             require("oil").setup({
                 delete_to_trash = true,
                 columns = { "icon" },
+                keymaps = {
+                    ["<C-h>"] = false,
+                    ["<C-j>"] = false,
+                    ["<C-k>"] = false,
+                    ["<C-l>"] = false,
+                    ["<C-c>"] = false,
+                },
                 view_options = {
                     show_hidden = true,
                 },
